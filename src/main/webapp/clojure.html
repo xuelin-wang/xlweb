@@ -1,0 +1,88 @@
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
+    <script src="jquery-2.1.3.min.js"></script>
+    <script src="react/react.js"></script>
+    <script src="react/JSXTransformer.js"></script>
+</head>
+
+<body>
+<script  type="text/jsx">
+var FuncParams =  React.createClass({
+  handleChange: function() {
+    this.props.onUserInput(
+      this.refs.funcNameSelect.getDOMNode().value,
+      this.refs.param0Input.getDOMNode().value
+    );
+  },
+  render: function() {
+    return (
+    <form>
+      <textarea
+         rows="3" cols="60" ref="param0Input" value={this.props.param0}
+         onChange={this.handleChange}
+      />
+      <select ref="funcNameSelect" value={this.props.funcName}
+         onChange={this.handleChange}
+      >
+        <option value="formatStr">formatStr</option>
+        <option value="formatStr2">formatStr2</option>
+      </select>
+    </form>
+    );
+  }
+});
+
+var TestClojure = React.createClass({
+    getInitialState: function() {
+        return {
+            funcName: 'formatStr',
+            param0: '',
+            retval: ''
+        };
+    },
+
+
+    handleUserInput: function(funcName, param0) {
+        component = this;
+        $.ajax(
+            {
+                url: "clojure?action=" + funcName + "&content=" + encodeURIComponent(param0),
+                success:
+                    function(result){
+                        component.setState({
+                            funcName: funcName,
+                            param0: param0,
+                            retval: result
+                        });
+                   }
+            });
+    },
+
+  render: function() {
+    return (
+      <div>
+        <FuncParams
+         param0={this.state.param0}
+         funcName={this.state.funcName}
+         onUserInput={this.handleUserInput}
+        />
+        <div>
+          <span>{this.state.retval}</span>
+        </div>
+      </div>
+    );
+  }
+});
+
+React.render(
+  <TestClojure />,
+  document.getElementById("testClojure")
+);
+
+
+</script>
+
+    <div id="testClojure" />
+</body>
+</html>
