@@ -36,11 +36,15 @@ public class ClojureServlet extends HttpServlet {
         String action = req.getParameter("action");
         Object result = null;
 
+        String param0 = req.getParameter("param0");
+        String param1 = req.getParameter("param1");
+        String param2 = req.getParameter("param2");
+
         if ("formatStr".equals(action)) {
-            result = formatStr(req.getParameter("content"));
+            result = formatStr(param0, param1, param2);
         }
         else if ("formatStr2".equals(action)) {
-            result = formatStr2(req.getParameter("content"));
+            result = formatStr2(param0, param1, param2);
         }
         else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -58,15 +62,15 @@ public class ClojureServlet extends HttpServlet {
         return (String)jsonWriteStr.invoke(param);
     }
 
-    private String formatStr(String content)
+    private String formatStr(String... params)
     {
         IFn formatStr = Clojure.var("xl.wendocs", "formatStr");
-        return (String)formatStr.invoke(content);
+        return (String)formatStr.invoke(params[0], params[1], params[2]);
     }
 
-    private Object formatStr2(String content)
+    private Object formatStr2(String... params)
     {
         IFn formatStr = Clojure.var("xl.wendocs", "formatStr2");
-        return formatStr.invoke(content);
+        return formatStr.invoke(params[0], params[1], params[2]);
     }
 }

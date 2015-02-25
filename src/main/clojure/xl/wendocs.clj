@@ -17,14 +17,14 @@
 
 (defn formatStr
   "just change str a bit"
-  [st]
-  (str "changed " st)
+  [& strs]
+  (apply str "changed " strs)
 )
 
 
 (defn formatStr2
   "just change str a bit more"
-  [st]
-  {"str" (str "changed " st)}
+  [& strs]
+  {"str" (apply str "changed " strs)}
 )
 
