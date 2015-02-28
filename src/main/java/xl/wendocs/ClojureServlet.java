@@ -2,7 +2,8 @@ package xl.wendocs;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,13 +14,13 @@ import java.io.PrintWriter;
  * Created by xuelin on 2/16/15.
  */
 public class ClojureServlet extends HttpServlet {
-    private static boolean _inited = false;
-    private static void initClojure() {
-        if (!_inited) {
+    private static boolean _warmedup = false;
+    static {
+        if (!_warmedup) {
             IFn require = Clojure.var("clojure.core", "require");
             require.invoke(Clojure.read("xl.wendocs"));
             require.invoke(Clojure.read("cheshire.core"));
-            _inited = true;
+            _warmedup = true;
         }
     }
 
@@ -29,22 +30,44 @@ public class ClojureServlet extends HttpServlet {
         doGet(req, resp);
     }
 
+    private String[] objsToStrs(Object[] params)
+    {
+        if (params == null)
+            return null;
+        String[] paramStrs = new String[params.length];
+        for (int index = 0; index < params.length; index++)
+            paramStrs[index] = String.valueOf(params[index]);
+        return paramStrs;
+    }
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        initClojure();
-        String action = req.getParameter("action");
+        String reqData = req.getParameter("reqData");
+        JSONObject reqJson = new JSONObject(reqData);
         Object result = null;
 
-        String param0 = req.getParameter("param0");
-        String param1 = req.getParameter("param1");
-        String param2 = req.getParameter("param2");
-
-        if ("formatStr".equals(action)) {
-            result = formatStr(param0, param1, param2);
+        String funcName = reqJson.getString("funcName");
+        JSONArray paramsArr = reqJson.optJSONArray("params");
+        Object[] params;
+        if (paramsArr == null) {
+            params = new Object[]{};
         }
-        else if ("formatStr2".equals(action)) {
-            result = formatStr2(param0, param1, param2);
+        else {
+            int len = paramsArr.length();
+            params = new Object[len];
+            for (int index = 0; index < len; index++) {
+                params[index] = paramsArr.get(index);
+            }
+        }
+
+        if ("formatStr".equals(funcName)) {
+            String[] paramStrs = objsToStrs(params);
+            result = formatStr(paramStrs);
+        }
+        else if ("formatStr2".equals(funcName)) {
+            String[] paramStrs = objsToStrs(params);
+            result = formatStr2(paramStrs);
         }
         else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
