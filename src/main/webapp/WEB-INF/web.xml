@@ -9,6 +9,10 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
 
     <servlet>
+        <servlet-name>invoke</servlet-name>
+        <servlet-class>xl.wendocs.InvokeServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>clojure</servlet-name>
         <servlet-class>xl.wendocs.ClojureServlet</servlet-class>
     </servlet>
@@ -20,6 +24,10 @@
         <servlet-name>wendocs</servlet-name>
         <servlet-class>xl.wendocs.WendocsServlet</servlet-class>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>invoke</servlet-name>
+        <url-pattern>/invoke</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>clojure</servlet-name>
         <url-pattern>/clojure</url-pattern>

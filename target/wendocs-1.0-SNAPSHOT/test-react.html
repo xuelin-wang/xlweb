@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>React Test</title>
+
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
+
+    <link href="select2/css/select2.min.css" rel="stylesheet" />
+    <link href="bootstrap-select2/select2-bootstrap.css" rel="stylesheet" />
+
+    <script src="jquery-2.1.3.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="select2/js/select2.min.js"></script>
+
+    <script src="react/react.js"></script>
+    <script src="react/JSXTransformer.js"></script>
+</head>    <link href="select2/css/select2.min.css" rel="stylesheet" />
+
+
+<body>
+
+
+
+
+<script type="text/javascript">
+  $('select').select2();
+</script>
+
+<script  type="text/jsx">
+
+var asyncCallIds = {
+    invoke: 0
+};
+
+function isNonempty(str) {
+    return typeof str != undefined && str != undefined && str != null && str.trim().length > 0;
+};
+
+var LabelField = React.createClass({
+  render: function() {
+    var classNames;
+      if (this.props.type == 'default')
+          classNames = 'label label-default';
+      else if (this.props.type == 'primary')
+          classNames = 'label label-primary';
+      else if (this.props.type == 'success')
+          classNames = 'label label-success';
+      else if (this.props.type == 'info')
+          classNames = 'label label-info';
+      else if (this.props.type == 'warning')
+          classNames = 'label label-warning';
+      else if (this.props.type == 'danger')
+          classNames = 'label label-danger';
+      else
+          throw "Invalid label type: " + this.props.type;
+
+    return (
+        <h3>
+        <span className={classNames}>
+        {this.props.dataValue}
+        </span></h3>
+    );
+    }
+});
+
+var InputField = React.createClass({
+    handleChange: function(event) {
+        if ("onUserInput" in this.props)
+            this.props.onUserInput(event.target.value);
+    },
+  render: function() {
+    return (
+      <div className="form-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+        <div className="input-group">
+        { isNonempty(this.props.preaddon) ?
+        <span className="input-group-addon">{this.props.preaddon}</span>
+        : null }
+        <input
+            type={this.props.type}
+            className="form-control"
+            onChange={this.handleChange}
+            value={this.props.dataValue} id={this.props.id} placeholder={this.props.placeHolder}
+            >
+        </input>
+        { isNonempty(this.props.postaddon) ?
+        <span className="input-group-addon">{this.props.postaddon}</span>
+        : null }
+        </div>
+      </div>
+    );
+  }
+});
+
+var SelectField = React.createClass({
+    handleChange: function(event) {
+        if ("onUserInput" in this.props)
+            this.props.onUserInput(event.target.value);
+    },
+    render: function(){
+      return (
+      <div className="form-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+<div className="select2-wrapper">
+      <select id={this.props.id} value={this.props.dataValue}
+         onChange={this.handleChange}  className="form-control select2"
+      >
+      {this.props.options.map(function(opt, index, arr) {
+        return (
+        <option key={index} value={opt.value}>{opt.hasOwnProperty('label') ? opt.label : opt.value}</option>
+        );
+      })
+      }
+      </select>
+</div>
+</div>
+      );
+    }
+});
+
+var CheckboxesField = React.createClass({
+    handleChange: function(val, checked) {
+        if ("onUserInput" in this.props) {
+            var dataValue = this.props.dataValue;
+            var found = false;
+            for (var index = 0; index < dataValue.length; index++) {
+                var thisVal = dataValue[index];
+                if (val == thisVal) {
+                    found = true;
+                    if (!checked) {
+                        dataValue.splice(index, 1);
+                    }
+                    break;
+                }
+            }
+            if (checked && !found)
+                dataValue.push(val);
+            this.props.onUserInput(dataValue);
+        }
+    },
+  render: function() {
+    var component = this;
+    return (
+      <div className="input-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+
+        {this.props.options.map(function(opt, index, arr) {
+
+    var thisHandleChange = function(event) {
+        return component.handleChange(opt.value, event.target.checked);
+    };
+    var thisChecked = false;
+    for (var tmpi = 0; tmpi < component.props.dataValue.length; tmpi++) {
+        if (component.props.dataValue[tmpi] == opt.value) {
+            thisChecked = true;
+            break;
+        }
+    }
+
+                return (
+                <label className='input-group' key={index}>
+        { isNonempty(opt.preaddon) ?
+        <span className="input-group-addon">{opt.preaddon}</span>
+        : null }
+
+        <input
+            type='checkbox'
+            onChange={thisHandleChange}
+            defaultChecked={thisChecked}
+            >
+        </input>
+
+        { isNonempty(opt.postaddon) ?
+        <span className="input-group-addon">{opt.postaddon}</span>
+        : null }
+                </label>
+                );
+            })
+        }
+
+      </div>
+    );
+  }
+});
+
+
+var spec=[
+    {
+        id: 'param0',
+        type: 'input',
+        preaddon: '@',
+        postaddon: '',
+        label: 'Field 0',
+        placeHolder: ''
+    },
+    {
+        id: 'param1',
+        type: 'input',
+        preaddon: '',
+        postaddon: '@example.com',
+        label: 'Field 1',
+        placeHolder: 'Enter an email address'
+    },
+    {
+        id: 'param2',
+        type: 'input',
+        preaddon: '$',
+        postaddon: '.00',
+        label: 'Field 2',
+        placeHolder: ''
+    },
+    {
+        id: 'funcName',
+        type: 'select',
+        options: [
+            {value: 'formatStr', label: 'format string'},
+            {value: 'formatStr2', label: 'format string to json'}
+            ],
+        defaultValue: 'formatStr',
+        label: 'Field 3',
+    },
+    {
+        id: 'param3',
+        type: 'input',
+        preaddon: '',
+        postaddon: '',
+        label: 'Field 4',
+        placeHolder: 'Enter plain input value'
+    },
+    {
+        id: 'param4',
+        type: 'checkboxes',
+        options: [
+            {
+                preaddon: 'First Choice Pre',
+                postaddon: '',
+                value: 'choice1'
+            },
+            {
+                preaddon: '',
+                postaddon: 'Second Choice Post',
+                value: 'choice2'
+            },
+            {
+                preaddon: 'Third Choice Pre',
+                postaddon: 'Third Choice Post',
+                value: 'choice3'
+            }
+        ],
+        defaultValue: ['choice2', 'choice3'],
+        label: 'Checkboxes'
+    },
+    {
+        id: 'retval',
+        type: 'label',
+        subtype: 'default',
+        defaultValue: '.'
+    }
+];
+
+function getDefaultValsFromSpec(theSpec)
+{
+    var defaultVals = {};
+    for (var index = 0; index < theSpec.length; index++) {
+        var itemSpec = theSpec[index];
+        var id = itemSpec.id;
+        if (itemSpec.hasOwnProperty('defaultValue'))
+            defaultVals[id] = itemSpec.defaultValue;
+        else
+            defaultVals[id] = '';
+    }
+    return defaultVals;
+}
+
+function getFallbackVal(vals, defaultVals, id)
+{
+    if (vals.hasOwnProperty(id))
+        return vals[id];
+    else if (defaultVals.hasOwnProperty(id))
+        return defaultVals[id];
+    else
+        return null;
+}
+
+var Fields = React.createClass({
+    getInitialState: function() {
+        return {
+            retval: '.'
+        };
+    },
+
+  render: function() {
+    var theSpec = this.props.spec;
+    var defaultVals = getDefaultValsFromSpec(theSpec);
+
+
+    var component = this;
+    var processItem = function(updateVal, updateId) {
+        var deltaState = {};
+        deltaState[updateId] = updateVal;
+        deltaState.retval = 'Calculating...';
+        component.setState(deltaState);
+
+        var userData = {};
+        for (var index = 0; index < theSpec.length; index++) {
+            var itemSpec = theSpec[index];
+            var id = itemSpec.id;
+            var val = getFallbackVal(component.state, defaultVals, id);
+            console.log('param id:' + id + ', val:' + val);
+            userData[id] = val;
+        }
+        userData[updateId] = updateVal;
+
+        var userDataStr = JSON.stringify(userData);
+
+        var newCallId = asyncCallIds.invoke + 1;
+        asyncCallIds.invoke = newCallId;
+        $.ajax(
+            {
+                url: "invoke?userData=" + encodeURIComponent(userDataStr),
+                error: function(xhr, textStatus, errorThrown) {
+                    if (asyncCallIds.invoke > newCallId)
+                      return;
+        var retval = 'Error';
+                    userData['retval'] = retval;
+                    component.setState({
+                        retval: retval
+                    });
+                },
+                success:
+                    function(result){
+                        if (asyncCallIds.invoke > newCallId)
+                          return;
+                        var retval;
+                        if (result == null || result.trim() == '')
+                            retval = '.';
+                        else
+                            retval = result;
+                        component.setState({
+                            retval: retval
+                        });
+                   }
+            });
+
+
+    };
+
+    var getHandleChangeFunc = function(id) {
+        var f = function(val) {
+            return processItem(val, id);
+        };
+        return f;
+    };
+
+  return (
+    <form>
+    {this.props.spec.map(
+        function(itemSpec, index, arr) {
+            var type = itemSpec.type;
+            var onUserInput = getHandleChangeFunc(itemSpec.id);
+            if (type == 'select') {
+                return (
+                <SelectField
+                    id={itemSpec.id}
+                    key={index}
+                    options={itemSpec.options}
+                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
+                    label={itemSpec.label}
+                    onUserInput = {onUserInput}
+                >
+                </SelectField>
+                );
+            }
+            else if (type == 'checkboxes') {
+                return (
+                <CheckboxesField
+                    id={itemSpec.id}
+                    key={index}
+                    options={itemSpec.options}
+                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
+                    label={itemSpec.label}
+                    onUserInput = {onUserInput}
+                >
+                </CheckboxesField>
+                );
+            }
+            else if (type == 'label') {
+                return (
+                <LabelField
+                    id={itemSpec.id}
+                    key={index}
+                    type={itemSpec.subtype}
+                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
+                >
+                </LabelField>
+                );
+            }
+            else {
+                return (
+                <InputField
+                    id={itemSpec.id}
+                    key={index}
+                    label={itemSpec.label}
+                    preaddon={itemSpec.preaddon}
+                    postaddon={itemSpec.postaddon}
+                    placeHolder={itemSpec.placeHolder}
+                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
+                    onUserInput = {onUserInput}
+                >
+                </InputField>
+                );
+            }
+        }
+    )}
+    </form>
+    );
+  }
+}
+);
+React.render(
+  <Fields
+      spec={spec}
+  >
+  </Fields>,
+  document.getElementById("testFields")
+);
+
+
+
+</script>
+
+
+
+
+<nav class="navbar navbar-default">
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="container">
+        <div>
+            <ul class="nav navbar-nav  navbar-fixed-top">
+                <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">Link</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">One more separated link</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <form class="navbar-form navbar-left" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Search">
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div>
+</nav>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div id="testFields"> </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4">.col-md-4</div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

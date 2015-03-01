@@ -11,14 +11,16 @@
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
 
     <link href="select2/css/select2.min.css" rel="stylesheet" />
+    <link href="bootstrap-select2/select2-bootstrap.css" rel="stylesheet" />
 
     <script src="jquery-2.1.3.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="select2/js/select2.min.js"></script>
 
-    <script src="react/react.min.js"></script>
+    <script src="react/react.js"></script>
     <script src="react/JSXTransformer.js"></script>
-</head>
+</head>    <link href="select2/css/select2.min.css" rel="stylesheet" />
+
 
 <body>
 
@@ -32,8 +34,285 @@
 <script  type="text/jsx">
 
 var asyncCallIds = {
-    clojure: 0
+    clojure: 0,
+    invoke: 0
 };
+
+function isNonempty(str) {
+    return typeof str != undefined && str != undefined && str != null && str.trim().length > 0;
+};
+
+var LabelField = React.createClass({
+  render: function() {
+    var classNames;
+      if (this.props.type == 'default')
+          classNames = 'label label-default';
+      else if (this.props.type == 'primary')
+          classNames = 'label label-primary';
+      else if (this.props.type == 'success')
+          classNames = 'label label-success';
+      else if (this.props.type == 'info')
+          classNames = 'label label-info';
+      else if (this.props.type == 'warning')
+          classNames = 'label label-warning';
+      else if (this.props.type == 'danger')
+          classNames = 'label label-danger';
+      else
+          throw "Invalid label type: " + this.props.type;
+
+    return (
+        <h3>
+        <span className={classNames}>
+        {this.props.label}
+        </span></h3>
+    );
+    }
+});
+
+var InputField = React.createClass({
+    handleChange: function(event) {
+        if ("onUserInput" in this.props)
+            this.props.onUserInput(event.target.value);
+    },
+  render: function() {
+    return (
+      <div className="form-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+        <div className="input-group">
+        { isNonempty(this.props.preaddon) ?
+        <span className="input-group-addon">{this.props.preaddon}</span>
+        : null }
+        <input
+            type={this.props.type}
+            className="form-control"
+            onChange={this.handleChange}
+            value={this.props.value} id={this.props.id} placeholder={this.props.placeHolder}
+            >
+        </input>
+        { isNonempty(this.props.postaddon) ?
+        <span className="input-group-addon">{this.props.postaddon}</span>
+        : null }
+        </div>
+      </div>
+    );
+  }
+});
+
+var SelectField = React.createClass({
+    handleChange: function(event) {
+        if ("onUserInput" in this.props)
+            this.props.onUserInput(event.target.value);
+    },
+    render: function(){
+      return (
+      <div className="form-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+<div className="select2-wrapper">
+      <select id={this.props.id} value={this.props.value}
+         onChange={this.handleChange}  className="form-control select2"
+      >
+      {this.props.options.map(function(val, index, arr) {
+        return (
+        <option key={index} value={val}>{val}</option>
+        );
+      })
+      }
+      </select>
+</div>
+</div>
+      );
+    }
+});
+
+var Fields = React.createClass({
+    getInitialState: function() {
+        return {
+            userData: null
+        };
+    },
+
+  render: function() {
+    var currState = this.state;
+    var theSpec = this.props.spec;
+    var getUserData = function() {
+        var userData = currState.userData;
+        if (userData == null) {
+            userData = {};
+            for (var index = 0; index < theSpec.length; index++) {
+                var itemSpec = theSpec[index];
+                var val;
+                if (typeof itemSpec.defaultValue == undefined)
+                    val = null;
+                else
+                    val = itemSpec.defaultValue;
+                if (val == null)
+                    val = '';
+                userData[itemSpec.id] = val;
+            }
+        }
+        return userData;
+    };
+
+    var component = this;
+    var processItem = function(val, id) {
+        var userData = getUserData();
+        userData[id] = val;
+        userData['retval'] = 'Calculating...';
+        component.setState({
+            userData: userData
+        });
+
+        var userDataStr = JSON.stringify(userData);
+
+        var newCallId = asyncCallIds.invoke + 1;
+        asyncCallIds.invoke = newCallId;
+        $.ajax(
+            {
+                url: "invoke?userData=" + encodeURIComponent(userDataStr),
+                error: function(xhr, textStatus, errorThrown) {
+                    if (asyncCallIds.invoke > newCallId)
+                      return;
+                    userData['retval'] = 'Error';
+                    component.setState({
+                        userData: userData
+                    });
+                },
+                success:
+                    function(result){
+                        if (asyncCallIds.invoke > newCallId)
+                          return;
+                        if (result == null || result.trim() == '')
+                            userData['retval'] = '.';
+                        else
+                            userData['retval'] = result;
+                        component.setState({
+                            userData: userData
+                        });
+                   }
+            });
+
+
+    };
+
+    var getHandleChangeFunc = function(id) {
+        var f = function(val) {
+            console.log("id: " + id + ", val:" + val);
+            return processItem(val, id);
+        };
+        return f;
+    };
+
+  return (
+    <form>
+    {this.props.spec.map(
+        function(itemSpec, index, arr) {
+            var type = itemSpec.type;
+            var onUserInput = getHandleChangeFunc(itemSpec.id);
+            if (type == 'select') {
+                return (
+                <SelectField
+                    id={itemSpec.id}
+                    key={index}
+                    options={itemSpec.options}
+                    value={getUserData[itemSpec.id]}
+                    label={itemSpec.label}
+                    onUserInput = {onUserInput}
+                >
+                </SelectField>
+                );
+            }
+            else if (type == 'label') {
+                return (
+                <LabelField
+                    id={itemSpec.id}
+                    key={index}
+                    type={itemSpec.subtype}
+                    label={getUserData[itemSpec.id]}
+                >
+                </LabelField>
+                );
+            }
+            else {
+                return (
+                <InputField
+                    id={itemSpec.id}
+                    key={index}
+                    label={itemSpec.label}
+                    preaddon={itemSpec.preaddon}
+                    postaddon={itemSpec.postaddon}
+                    placeHolder={itemSpec.placeHolder}
+                    value={getUserData[itemSpec.id]}
+                    onUserInput = {onUserInput}
+                >
+                </InputField>
+                );
+            }
+        }
+    )}
+    </form>
+    );
+  }
+}
+);
+
+var spec=[
+    {
+        id: 'param0',
+        type: 'input',
+        preaddon: '@',
+        postaddon: '',
+        label: 'Field 0',
+        placeHolder: ''
+    },
+    {
+        id: 'param1',
+        type: 'input',
+        preaddon: '',
+        postaddon: '@example.com',
+        label: 'Field 1',
+        placeHolder: 'Enter an email address'
+    },
+    {
+        id: 'param2',
+        type: 'input',
+        preaddon: '$',
+        postaddon: '.00',
+        label: 'Field 2',
+        placeHolder: ''
+    },
+    {
+        id: 'funcName',
+        type: 'select',
+        options: ['formatStr', 'formatStr2'],
+        defaultValue: 'formatStr',
+        label: 'Field 3',
+    },
+    {
+        id: 'param3',
+        type: 'input',
+        preaddon: '',
+        postaddon: '',
+        label: 'Field 4',
+        placeHolder: 'Enter plain input value'
+    },
+    {
+        id: 'retval',
+        type: 'label',
+        subtype: 'default',
+        defaultValue: '.'
+    }
+];
+React.render(
+  <Fields
+      spec={spec}
+  >
+  </Fields>,
+  document.getElementById("testFields")
+);
 
 var FuncParams =  React.createClass({
   handleChange: function() {
@@ -71,12 +350,14 @@ var FuncParams =  React.createClass({
   <span className="input-group-addon">.00</span>
 </div>
 
+<div className="select2-wrapper">
       <select ref="funcNameSelect" value={this.props.reqData.funcName}
-         onChange={this.handleChange}  className="js-example-basic-single"
+         onChange={this.handleChange}  className="form-control select2"
       >
         <option value="formatStr">formatStr</option>
         <option value="formatStr2">formatStr2</option>
       </select>
+</div>
 
 </form>
 
@@ -195,7 +476,14 @@ React.render(
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-            <div id="testClojure" />
+            <div id="testFields"> </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div id="testClojure"> </div>
         </div>
         <div class="col-md-1"></div>
     </div>

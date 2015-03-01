@@ -14,6 +14,7 @@ org/json/CookieList.class
 org/json/HTTPTokener.class
 xl/util/Args.class
 xl/util/CommandWrapper$ArgValue.class
+xl/wendocs/InvokeServlet.class
 org/json/CDL.class
 org/json/JSONArray.class
 xl/util/Arg.class
