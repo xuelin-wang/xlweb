@@ -1,0 +1,46 @@
+{
+  "name": "react-date-picker",
+  "version": "0.5.1",
+  "authors": [
+    "Remon Oldenbeuving <remon@hackerone.com>",
+    "Martijn Russchen <martijn@hackerone.com>"
+  ],
+  "description": "A simple and reusable datepicker component for React",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Hacker0x01/react-datepicker.git"
+  },
+  "license": "MIT",
+  "main": [
+    "react-datepicker.js",
+    "react-datepicker.css",
+    "react-datepicker.css.map"
+  ],
+  "keywords": [
+    "react",
+    "datepicker",
+    "calendar"
+  ],
+  "dependencies": {
+    "react": "< 0.13",
+    "moment": "2.8.2",
+    "tether": "0.6.5",
+    "react-onclickoutside": "0.2.1"
+  },
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules"
+  ],
+  "homepage": "https://github.com/Hacker0x01/react-datepicker",
+  "_release": "0.5.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.5.1",
+    "commit": "918318e3bc3689bb1f2d2d399f64e23c6a770770"
+  },
+  "_source": "git://github.com/Hacker0x01/react-datepicker.git",
+  "_target": "~0.5.1",
+  "_originalSource": "react-date-picker",
+  "_direct": true
+}

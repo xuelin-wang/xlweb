@@ -4,7 +4,6 @@ function isNonempty(str) {
 };
 
 var asyncCallIds = {
-    invoke: 0
 };
 
 var LabelField = React.createClass({
@@ -64,6 +63,35 @@ var InputField = React.createClass({
     );
   }
 });
+
+var DateField = React.createClass({
+    handleChange: function(date) {
+        if ("onUserInput" in this.props) {
+            this.props.onUserInput(date);
+        }
+    },
+  render: function() {
+    return (
+      <div className="form-group">
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+        <div className="input-group">
+            <DatePicker
+              ref='theDatePicker'
+              id={this.props.id}
+              selected= {this.props.dataValue}
+              onChange={this.handleChange}
+              placeholderText={this.props.placeHolder}
+              dateFormat="YYYYMMDD"
+            >
+            </DatePicker>
+        </div>
+      </div>
+    );
+  }
+});
+
 
 var SelectField = React.createClass({
     handleChange: function(event) {
@@ -196,7 +224,7 @@ var Form = React.createClass({
   render: function() {
     var theSpec = this.props.spec;
     var defaultVals = getDefaultValsFromSpec(theSpec);
-
+    var thisId = this.props.id;
 
     var component = this;
     var processItem = function(updateVal, updateId) {
@@ -217,13 +245,19 @@ var Form = React.createClass({
 
         var userDataStr = JSON.stringify(userData);
 
-        var newCallId = asyncCallIds.invoke + 1;
-        asyncCallIds.invoke = newCallId;
+        var newCallId;
+        if (!asyncCallIds.hasOwnProperty(thisId))
+            newCallId = 0;
+        else
+            newCallId = asyncCallIds[thisId] + 1;
+
+        asyncCallIds[thisId] = newCallId;
+
         $.ajax(
             {
-                url: "invoke?userData=" + encodeURIComponent(userDataStr),
+                url: component.props.url + "?userData=" + encodeURIComponent(userDataStr),
                 error: function(xhr, textStatus, errorThrown) {
-                    if (asyncCallIds.invoke > newCallId)
+                    if (asyncCallIds[thisId] > newCallId)
                       return;
         var retval = 'Error';
                     userData['retval'] = retval;
@@ -233,7 +267,7 @@ var Form = React.createClass({
                 },
                 success:
                     function(result){
-                        if (asyncCallIds.invoke > newCallId)
+                        if (asyncCallIds[thisId] > newCallId)
                           return;
                         var retval;
                         if (result == null || result.trim() == '')
@@ -297,6 +331,19 @@ var Form = React.createClass({
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
                 >
                 </LabelField>
+                );
+            }
+            else if (type == 'date') {
+                return (
+                <DateField
+                    id={itemSpec.id}
+                    key={index}
+                    label={itemSpec.label}
+                    placeHolder={itemSpec.placeHolder}
+                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
+                    onUserInput = {onUserInput}
+                >
+                </DateField>
                 );
             }
             else {
