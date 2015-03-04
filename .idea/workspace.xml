@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="038e683b-34db-4a46-9742-816d18c62155" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT.war" afterPath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT.war" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/js/Form.js" afterPath="$PROJECT_DIR$/src/main/webapp/js/Form.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/jsx/Form.js" afterPath="$PROJECT_DIR$/src/main/webapp/jsx/Form.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/xl/wendocs/InvokeServlet.java" afterPath="$PROJECT_DIR$/src/main/java/xl/wendocs/InvokeServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/test-react.html" afterPath="$PROJECT_DIR$/src/main/webapp/test-react.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="wendocs.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,8 +36,8 @@
       <file leaf-file-name="test-react.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/test-react.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7624848" vertical-offset="2209" max-vertical-offset="3105">
-              <caret line="189" column="87" selection-start-line="189" selection-start-column="87" selection-end-line="189" selection-end-column="87" />
+            <state vertical-scroll-proportion="0.3966346" vertical-offset="450" max-vertical-offset="4305">
+              <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -45,8 +46,8 @@
       <file leaf-file-name="Form.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/jsx/Form.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4077" max-vertical-offset="5790">
-              <caret line="286" column="49" selection-start-line="286" selection-start-column="49" selection-end-line="286" selection-end-column="49" />
+            <state vertical-scroll-proportion="-117.85714" vertical-offset="45" max-vertical-offset="5625">
+              <caret line="223" column="0" selection-start-line="223" selection-start-column="0" selection-end-line="223" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -103,10 +104,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="525" />
-    <option name="y" value="104" />
-    <option name="width" value="1319" />
-    <option name="height" value="953" />
+    <option name="x" value="260" />
+    <option name="y" value="67" />
+    <option name="width" value="1394" />
+    <option name="height" value="992" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -499,7 +500,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="525" y="104" width="1319" height="953" extended-state="0" />
+    <frame x="260" y="67" width="1394" height="992" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -517,7 +518,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25094768" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2374462" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32936507" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -910,16 +911,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/jsx/Form.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3510" max-vertical-offset="5790">
-          <caret line="286" column="49" selection-start-line="286" selection-start-column="49" selection-end-line="286" selection-end-column="49" />
+        <state vertical-scroll-proportion="-117.85714" vertical-offset="45" max-vertical-offset="5625">
+          <caret line="223" column="0" selection-start-line="223" selection-start-column="0" selection-end-line="223" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/test-react.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7624848" vertical-offset="2209" max-vertical-offset="3105">
-          <caret line="189" column="87" selection-start-line="189" selection-start-column="87" selection-end-line="189" selection-end-column="87" />
+        <state vertical-scroll-proportion="0.3966346" vertical-offset="450" max-vertical-offset="4305">
+          <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
           <folding />
         </state>
       </provider>

@@ -221,7 +221,6 @@ function getFallbackVal(vals, defaultVals, id)
 var Form = React.createClass({displayName: "Form",
     getInitialState: function() {
         return {
-            retval: '.'
         };
     },
 
@@ -234,63 +233,53 @@ var Form = React.createClass({displayName: "Form",
     var processItem = function(updateVal, updateId) {
         var deltaState = {};
         deltaState[updateId] = updateVal;
-        deltaState.retval = 'Calculating...';
         component.setState(deltaState);
 
-        var userData = {};
-        for (var index = 0; index < theSpec.length; index++) {
-            var itemSpec = theSpec[index];
-            var id = itemSpec.id;
-            var val = getFallbackVal(component.state, defaultVals, id);
-            console.log('param id:' + id + ', val:' + val);
-            userData[id] = val;
-        }
-        userData[updateId] = updateVal;
+        if (component.props.hasOwnProperty('url') && component.props.url != undefined && component.props.url != null) {
+            var userData = {};
+            for (var index = 0; index < theSpec.length; index++) {
+                var itemSpec = theSpec[index];
+                var id = itemSpec.id;
+                var val = getFallbackVal(component.state, defaultVals, id);
+                console.log('param id:' + id + ', val:' + val);
+                userData[id] = val;
+            }
+            userData[updateId] = updateVal;
 
-        var userDataStr = JSON.stringify(userData);
+            var userDataStr = JSON.stringify(userData);
 
-        var newCallId;
-        if (!asyncCallIds.hasOwnProperty(thisId))
-            newCallId = 0;
-        else
-            newCallId = asyncCallIds[thisId] + 1;
+            var newCallId;
+            if (!asyncCallIds.hasOwnProperty(thisId))
+                newCallId = 0;
+            else
+                newCallId = asyncCallIds[thisId] + 1;
 
-        asyncCallIds[thisId] = newCallId;
+            asyncCallIds[thisId] = newCallId;
+            if (component.props.hasOwnProperty('willAjax') && component.props.willAjax != undefined && component.props.willAjax != null) {
+                component.props.willAjax(userData);
+            }
 
-        $.ajax(
-            {
-                url: component.props.url + "?userData=" + encodeURIComponent(userDataStr),
-                error: function(xhr, textStatus, errorThrown) {
-                    if (asyncCallIds[thisId] > newCallId)
-                      return;
-        var retval = 'Error';
-                    userData['retval'] = retval;
-                    component.setState({
-                        retval: retval
-                    });
-                },
-                success:
-                    function(result){
+            $.ajax(
+                {
+                    url: component.props.url + "?userData=" + encodeURIComponent(userDataStr),
+                    dataType: component.props.dataType,
+                    error: function(xhr, textStatus, errorThrown) {
                         if (asyncCallIds[thisId] > newCallId)
                           return;
-                        var retval;
-                        if (result == null || result.trim() == '')
-                            retval = '.';
-                        else
-                            retval = result;
-                        component.setState({
-                            retval: retval
-                        });
-                        if (component.props.hasOwnProperty('callback')) {
-                            var callback = component.props.callback;
-                            if (callback != null) {
-                                callback(retval);
-                            }
+                        if (component.props.hasOwnProperty('error') && component.props.error != undefined && component.props.error != null) {
+                            component.props.error(xhr, textStatus, errorThrown);
                         }
-                   }
-            });
-
-
+                    },
+                    success:
+                        function(result, textStatus, xhr){
+                            if (asyncCallIds[thisId] > newCallId)
+                              return;
+                            if (component.props.hasOwnProperty('success') && component.props.success != undefined && component.props.success != null) {
+                                component.props.success(result, textStatus, xhr);
+                            }
+                       }
+                });
+        }
     };
 
     var getHandleChangeFunc = function(id) {

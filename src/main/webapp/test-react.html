@@ -36,39 +36,19 @@
 
 
 
-
-
-<nav class="navbar navbar-default">
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="container">
-        <div>
-            <ul class="nav navbar-nav  navbar-fixed-top">
-                <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-                <li><a href="#">Link</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Separated link</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">One more separated link</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <form class="navbar-form navbar-left" role="search">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search">
-                            <button type="submit" class="btn btn-default">Submit</button>
-                        </div>
-                    </form>
-                </li>
-            </ul>
-        </div><!-- /.navbar-collapse -->
-    </div>
-</nav>
+<ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="#">Home</a></li>
+    <li role="presentation"><a href="#">Profile</a></li>
+    <li role="presentation"><a href="#">Messages</a></li>
+    <li>
+        <form class="navbar-form navbar-left" role="search">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </form>
+    </li>
+</ul>
 
 
 <div class="container-fluid">
@@ -76,6 +56,13 @@
         <div class="col-md-1"></div>
         <div class="col-md-10">
             <div id="testFields"> </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div id="retval"> </div>
         </div>
         <div class="col-md-1"></div>
     </div>
@@ -169,25 +156,118 @@ var spec=[
         type: 'date',
         label: 'Date Field',
         placeHolder: 'Click to enter date'
-    },
+    }
+];
+
+retvalSpec = [
     {
         id: 'retval',
         type: 'label',
         subtype: 'default',
-        defaultValue: '.'
+        defaultValue: ' '
+    },
+    {
+        id: 'retvalSuccess',
+        type: 'label',
+        subtype: 'success',
+        defaultValue: ' '
+    },
+    {
+        id: 'retvalInfo',
+        type: 'label',
+        subtype: 'info',
+        defaultValue: ' '
+    },
+    {
+        id: 'retvalWarning',
+        type: 'label',
+        subtype: 'warning',
+        defaultValue: ' '
+    },
+    {
+        id: 'retvalDanger',
+        type: 'label',
+        subtype: 'danger',
+        defaultValue: ' '
+    },
+    {
+        id: 'retvalPrimary',
+        type: 'label',
+        subtype: 'primary',
+        defaultValue: ' '
     }
 ];
+
+
 $( document ).ready(function() {
 
   $('select').select2();
 
-  var callback = function(retval) {
-      var prettyStr = JSON.stringify(JSON.parse(retval),null,2)
+
+  var retvalComponent = React.render(
+    React.createElement(Form,
+       {
+           spec:retvalSpec,
+           id:'retval',
+           url: null
+       }
+    ),
+    document.getElementById("retval")
+  );
+
+  var willAjax = function(userData) {
+      var str = 'Calculating...';
+      var deltaState = {
+        retval: str,
+        retvalPrimary: str,
+        retvalSuccess: str,
+        retvalInfo: str,
+        retvalWarning: str,
+        retvalDanger: str
+      };
+      retvalComponent.setState(deltaState);
+  };
+
+  var success = function(result, textStatus, xhr) {
+      var str = JSON.stringify(result, null,2);
+      var deltaState = {
+        retval: str,
+        retvalPrimary: str,
+        retvalSuccess: str,
+        retvalInfo: str,
+        retvalWarning: str,
+        retvalDanger: str
+      };
+      retvalComponent.setState(deltaState);
+      var prettyStr = JSON.stringify(result, null,2)
       $('#prettyRetval').html(prettyStr);
   };
 
-  React.render(
-    React.createElement(Form, {spec:spec, id:'invoke', url:'invoke', callback: callback}),
+  var error = function(xhr, textStatus, errorThrown) {
+      var str = 'Error';
+      var deltaState = {
+        retval: str,
+        retvalPrimary: str,
+        retvalSuccess: str,
+        retvalInfo: str,
+        retvalWarning: str,
+        retvalDanger: str
+      };
+      retvalComponent.setState(deltaState);
+  };
+
+  var formComponent = React.render(
+    React.createElement(Form,
+       {
+           spec:spec,
+           id:'invoke',
+           url:'invoke',
+           dataType: 'json',
+           willAjax: willAjax,
+           error: error,
+           success: success
+       }
+    ),
     document.getElementById("testFields")
   );
 
