@@ -105,8 +105,12 @@ var SelectField = React.createClass({displayName: "SelectField",
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
 React.createElement("div", {className: "select2-wrapper"}, 
-      React.createElement("select", {id: this.props.id, value: this.props.dataValue, 
-         onChange: this.handleChange, className: "form-control select2"
+      React.createElement("select", {
+         id: this.props.id, 
+         value: this.props.dataValue, 
+         onChange: this.handleChange, 
+         className: "form-control select2", 
+         size: this.props.visibleSize
       }, 
       this.props.options.map(function(opt, index, arr) {
         return (
@@ -277,6 +281,12 @@ var Form = React.createClass({displayName: "Form",
                         component.setState({
                             retval: retval
                         });
+                        if (component.props.hasOwnProperty('callback')) {
+                            var callback = component.props.callback;
+                            if (callback != null) {
+                                callback(retval);
+                            }
+                        }
                    }
             });
 

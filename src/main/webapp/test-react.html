@@ -80,6 +80,13 @@
         <div class="col-md-1"></div>
     </div>
     <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <pre id="prettyRetval"> </pre>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <div class="row">
         <div class="col-md-4">.col-md-4</div>
         <div class="col-md-4">.col-md-4</div>
         <div class="col-md-4">.col-md-4</div>
@@ -123,8 +130,8 @@ var spec=[
             {value: 'formatStr', label: 'format string'},
             {value: 'formatStr2', label: 'format string to json'}
             ],
-        defaultValue: 'formatStr',
-        label: 'Field 3',
+        defaultValue: 'formatStr2',
+        label: 'Field 3'
     },
     {
         id: 'param3',
@@ -171,12 +178,18 @@ var spec=[
     }
 ];
 $( document ).ready(function() {
-  React.render(
-    React.createElement(Form, {spec:spec, id:'invoke', url:'invoke'}),
-    document.getElementById("testFields")
-  );
 
   $('select').select2();
+
+  var callback = function(retval) {
+      var prettyStr = JSON.stringify(JSON.parse(retval),null,2)
+      $('#prettyRetval').html(prettyStr);
+  };
+
+  React.render(
+    React.createElement(Form, {spec:spec, id:'invoke', url:'invoke', callback: callback}),
+    document.getElementById("testFields")
+  );
 
 });
 

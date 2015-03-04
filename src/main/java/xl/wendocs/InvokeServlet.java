@@ -71,10 +71,11 @@ public class InvokeServlet extends HttpServlet {
             result = formatStr(strArr);
         }
         else if ("formatStr2".equals(funcName)) {
-            result = formatStr2(strArr);
+            result = formatStr2(userDataJson);
         }
         else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
@@ -82,7 +83,7 @@ public class InvokeServlet extends HttpServlet {
         out.close();
     }
 
-    private String formatStr(String... params)
+    private String concatParams(String... params)
     {
         StringBuilder sb = new StringBuilder();
         for (String param: params) {
@@ -91,11 +92,19 @@ public class InvokeServlet extends HttpServlet {
         return sb.toString();
     }
 
-    private String formatStr2(String... params)
+    private String formatStr(String... params)
     {
-        String str = formatStr(params);
+        String str = concatParams(params);
         JSONObject jsonObj = new JSONObject();
         jsonObj.put("str", str);
+        jsonObj.put("funcName", "formatStr");
         return jsonObj.toString();
+    }
+    private String formatStr2(JSONObject userDataJson)
+    {
+        userDataJson.remove("retval");
+        userDataJson.put("funcName", "formatStr");
+        userDataJson.put("serverSays", "I am server, but I knwo what you are doing!");
+        return userDataJson.toString();
     }
 }
