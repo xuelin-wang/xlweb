@@ -47,28 +47,28 @@ var LabelField = React.createClass({
 
     if (types.indexOf('h1') >= 0)
         return (
-            <h1>
+            <h1 {...this.props}>
             <span className={classNames}>
             {this.props.dataValue}
             </span></h1>
         );
     else if (types.indexOf('h2') >= 0)
         return (
-            <h2>
+            <h2 {...this.props}>
             <span className={classNames}>
             {this.props.dataValue}
             </span></h2>
         );
     else if (types.indexOf('h3') >= 0)
         return (
-            <h3>
+            <h3 {...this.props}>
             <span className={classNames}>
             {this.props.dataValue}
             </span></h3>
         );
     else if (types.indexOf('pre') >= 0)
         return (
-            <div>
+            <div {...this.props}>
             <pre className={classNames}>
             {this.props.dataValue}
             </pre>
@@ -76,7 +76,7 @@ var LabelField = React.createClass({
         );
     else
         return (
-            <div>
+            <div {...this.props}>
             <span className={classNames}>
             {this.props.dataValue}
             </span>
@@ -92,8 +92,9 @@ var InputField = React.createClass({
     },
   render: function() {
     var classNames = mergeClassNames("form-group", this.props);
+    var divId = 'div_' + this.props.id;
     return (
-      <div className={classNames}>
+      <div {...this.props} id={divId} className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -117,6 +118,28 @@ var InputField = React.createClass({
   }
 });
 
+var SwapField = React.createClass({
+  render: function() {
+    var editSpec = this.props.editSpec;
+    var displaySpec = this.props.displaySpec;
+    var isEdit = this.props.isEdit;
+    var id = this.props.id;
+
+    var key = this.props.key;
+    var dataValue = this.props.dataValue;
+    var onUserInput = this.props.onUserInput;
+
+    if (isEdit) {
+        editSpec.id = id;
+        return renderBySpec(editSpec, key, dataValue, onUserInput);
+    }
+    else {
+        displaySpec.id = id;
+        return renderBySpec(displaySpec, key, dataValue, onUserInput);
+    }
+  }
+});
+
 var DateField = React.createClass({
     handleChange: function(date) {
         if ("onUserInput" in this.props) {
@@ -125,8 +148,9 @@ var DateField = React.createClass({
     },
   render: function() {
     var classNames = mergeClassNames("form-group", this.props);
+    var divId = "div_" + this.props.id;
     return (
-      <div className={classNames}>
+      <div {...this.props} id={divId} className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -154,8 +178,9 @@ var SelectField = React.createClass({
     },
     render: function(){
     var classNames = mergeClassNames("form-group", this.props);
+    var divId = 'div_' + this.props.id;
       return (
-      <div className={classNames}>
+      <div {...this.props} id={divId}  className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -203,8 +228,9 @@ var CheckboxesField = React.createClass({
   render: function() {
     var component = this;
     var classNames = mergeClassNames("input-group", this.props);
+    var divId = 'div_' + this.props.id;
     return (
-      <div className={classNames}>
+      <div {...this.props} id={divId} className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -272,6 +298,65 @@ function getFallbackVal(vals, defaultVals, id)
         return defaultVals[id];
     else
         return null;
+}
+
+function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
+{
+    var type = itemSpec.type;
+    if (type == 'select') {
+        return (
+        <SelectField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+            onUserInput = {onUserInput}
+        >
+        </SelectField>
+        );
+    }
+    else if (type == 'checkboxes') {
+        return (
+        <CheckboxesField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+            onUserInput = {onUserInput}
+        >
+        </CheckboxesField>
+        );
+    }
+    else if (type == 'label') {
+        return (
+        <LabelField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+        >
+        </LabelField>
+        );
+    }
+    else if (type == 'date') {
+        return (
+        <DateField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+            onUserInput = {onUserInput}
+        >
+        </DateField>
+        );
+    }
+    else {
+        return (
+        <InputField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+            onUserInput = {onUserInput}
+        >
+        </InputField>
+        );
+    }
 }
 
 var Form = React.createClass({
@@ -349,64 +434,11 @@ var Form = React.createClass({
     <form>
     {this.props.spec.map(
         function(itemSpec, index, arr) {
-            var type = itemSpec.type;
             var onUserInput = getHandleChangeFunc(itemSpec.id);
-            if (type == 'select') {
-                return (
-                <SelectField
-                   {...itemSpec}
-                    key={index}
-                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    onUserInput = {onUserInput}
-                >
-                </SelectField>
-                );
-            }
-            else if (type == 'checkboxes') {
-                return (
-                <CheckboxesField
-                   {...itemSpec}
-                    key={index}
-                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    onUserInput = {onUserInput}
-                >
-                </CheckboxesField>
-                );
-            }
-            else if (type == 'label') {
-                return (
-                <LabelField
-                   {...itemSpec}
-                    key={index}
-                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                >
-                </LabelField>
-                );
-            }
-            else if (type == 'date') {
-                return (
-                <DateField
-                   {...itemSpec}
-                    key={index}
-                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    onUserInput = {onUserInput}
-                >
-                </DateField>
-                );
-            }
-            else {
-                return (
-                <InputField
-                   {...itemSpec}
-                    key={index}
-                    dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    onUserInput = {onUserInput}
-                >
-                </InputField>
-                );
-            }
+            var dataValue = getFallbackVal(component.state, defaultVals, itemSpec.id)
+            return renderBySpec(itemSpec, index, dataValue, onUserInput);
         }
-    )}
+     )}
     </form>
     );
   }
