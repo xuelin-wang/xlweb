@@ -6,30 +6,82 @@ function isNonempty(str) {
 var asyncCallIds = {
 };
 
+var mergeClassNames = function(classNames, props) {
+    var passedClassNames;
+    if ('className' in props)
+        passedClassNames = props.className;
+    else
+        passedClassNames = '';
+
+    if (classNames == null || classNames == '')
+        return passedClassNames;
+    else
+        return classNames + ' ' + passedClassNames;
+};
+
 var LabelField = React.createClass({
   render: function() {
     var classNames;
-      if (this.props.type == 'default')
+    var types;
+    if ('type' in this.props)
+      types = this.props.subtype.split(" ");
+    else
+      types = [];
+
+    if (types.indexOf('default') >= 0)
           classNames = 'label label-default';
-      else if (this.props.type == 'primary')
+    else if (types.indexOf('primary') >= 0)
           classNames = 'label label-primary';
-      else if (this.props.type == 'success')
+    else if (types.indexOf('success') >= 0)
           classNames = 'label label-success';
-      else if (this.props.type == 'info')
+    else if (types.indexOf('info') >= 0)
           classNames = 'label label-info';
-      else if (this.props.type == 'warning')
+    else if (types.indexOf('warning') >= 0)
           classNames = 'label label-warning';
-      else if (this.props.type == 'danger')
+    else if (types.indexOf('danger') >= 0)
           classNames = 'label label-danger';
       else
-          throw "Invalid label type: " + this.props.type;
+          classNames = '';
 
-    return (
-        <h3>
-        <span className={classNames}>
-        {this.props.dataValue}
-        </span></h3>
-    );
+    classNames = mergeClassNames(classNames, this.props);
+
+    if (types.indexOf('h1') >= 0)
+        return (
+            <h1>
+            <span className={classNames}>
+            {this.props.dataValue}
+            </span></h1>
+        );
+    else if (types.indexOf('h2') >= 0)
+        return (
+            <h2>
+            <span className={classNames}>
+            {this.props.dataValue}
+            </span></h2>
+        );
+    else if (types.indexOf('h3') >= 0)
+        return (
+            <h3>
+            <span className={classNames}>
+            {this.props.dataValue}
+            </span></h3>
+        );
+    else if (types.indexOf('pre') >= 0)
+        return (
+            <div>
+            <pre className={classNames}>
+            {this.props.dataValue}
+            </pre>
+            </div>
+        );
+    else
+        return (
+            <div>
+            <span className={classNames}>
+            {this.props.dataValue}
+            </span>
+            </div>
+        );
     }
 });
 
@@ -39,8 +91,9 @@ var InputField = React.createClass({
             this.props.onUserInput(event.target.value);
     },
   render: function() {
+    var classNames = mergeClassNames("form-group", this.props);
     return (
-      <div className="form-group">
+      <div className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -71,8 +124,9 @@ var DateField = React.createClass({
         }
     },
   render: function() {
+    var classNames = mergeClassNames("form-group", this.props);
     return (
-      <div className="form-group">
+      <div className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -99,8 +153,9 @@ var SelectField = React.createClass({
             this.props.onUserInput(event.target.value);
     },
     render: function(){
+    var classNames = mergeClassNames("form-group", this.props);
       return (
-      <div className="form-group">
+      <div className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -147,8 +202,9 @@ var CheckboxesField = React.createClass({
     },
   render: function() {
     var component = this;
+    var classNames = mergeClassNames("input-group", this.props);
     return (
-      <div className="input-group">
+      <div className={classNames}>
         { isNonempty(this.props.label) ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
@@ -298,11 +354,9 @@ var Form = React.createClass({
             if (type == 'select') {
                 return (
                 <SelectField
-                    id={itemSpec.id}
+                   {...itemSpec}
                     key={index}
-                    options={itemSpec.options}
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    label={itemSpec.label}
                     onUserInput = {onUserInput}
                 >
                 </SelectField>
@@ -311,11 +365,9 @@ var Form = React.createClass({
             else if (type == 'checkboxes') {
                 return (
                 <CheckboxesField
-                    id={itemSpec.id}
+                   {...itemSpec}
                     key={index}
-                    options={itemSpec.options}
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
-                    label={itemSpec.label}
                     onUserInput = {onUserInput}
                 >
                 </CheckboxesField>
@@ -324,9 +376,8 @@ var Form = React.createClass({
             else if (type == 'label') {
                 return (
                 <LabelField
-                    id={itemSpec.id}
+                   {...itemSpec}
                     key={index}
-                    type={itemSpec.subtype}
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
                 >
                 </LabelField>
@@ -335,10 +386,8 @@ var Form = React.createClass({
             else if (type == 'date') {
                 return (
                 <DateField
-                    id={itemSpec.id}
+                   {...itemSpec}
                     key={index}
-                    label={itemSpec.label}
-                    placeHolder={itemSpec.placeHolder}
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
                     onUserInput = {onUserInput}
                 >
@@ -348,12 +397,8 @@ var Form = React.createClass({
             else {
                 return (
                 <InputField
-                    id={itemSpec.id}
+                   {...itemSpec}
                     key={index}
-                    label={itemSpec.label}
-                    preaddon={itemSpec.preaddon}
-                    postaddon={itemSpec.postaddon}
-                    placeHolder={itemSpec.placeHolder}
                     dataValue={getFallbackVal(component.state, defaultVals, itemSpec.id)}
                     onUserInput = {onUserInput}
                 >

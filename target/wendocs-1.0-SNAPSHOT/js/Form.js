@@ -6,30 +6,82 @@ function isNonempty(str) {
 var asyncCallIds = {
 };
 
+var mergeClassNames = function(classNames, props) {
+    var passedClassNames;
+    if ('className' in props)
+        passedClassNames = props.className;
+    else
+        passedClassNames = '';
+
+    if (classNames == null || classNames == '')
+        return passedClassNames;
+    else
+        return classNames + ' ' + passedClassNames;
+};
+
 var LabelField = React.createClass({displayName: "LabelField",
   render: function() {
     var classNames;
-      if (this.props.type == 'default')
+    var types;
+    if ('type' in this.props)
+      types = this.props.subtype.split(" ");
+    else
+      types = [];
+
+    if (types.indexOf('default') >= 0)
           classNames = 'label label-default';
-      else if (this.props.type == 'primary')
+    else if (types.indexOf('primary') >= 0)
           classNames = 'label label-primary';
-      else if (this.props.type == 'success')
+    else if (types.indexOf('success') >= 0)
           classNames = 'label label-success';
-      else if (this.props.type == 'info')
+    else if (types.indexOf('info') >= 0)
           classNames = 'label label-info';
-      else if (this.props.type == 'warning')
+    else if (types.indexOf('warning') >= 0)
           classNames = 'label label-warning';
-      else if (this.props.type == 'danger')
+    else if (types.indexOf('danger') >= 0)
           classNames = 'label label-danger';
       else
-          throw "Invalid label type: " + this.props.type;
+          classNames = '';
 
-    return (
-        React.createElement("h3", null, 
-        React.createElement("span", {className: classNames}, 
-        this.props.dataValue
-        ))
-    );
+    classNames = mergeClassNames(classNames, this.props);
+
+    if (types.indexOf('h1') >= 0)
+        return (
+            React.createElement("h1", null, 
+            React.createElement("span", {className: classNames}, 
+            this.props.dataValue
+            ))
+        );
+    else if (types.indexOf('h2') >= 0)
+        return (
+            React.createElement("h2", null, 
+            React.createElement("span", {className: classNames}, 
+            this.props.dataValue
+            ))
+        );
+    else if (types.indexOf('h3') >= 0)
+        return (
+            React.createElement("h3", null, 
+            React.createElement("span", {className: classNames}, 
+            this.props.dataValue
+            ))
+        );
+    else if (types.indexOf('pre') >= 0)
+        return (
+            React.createElement("div", null, 
+            React.createElement("pre", {className: classNames}, 
+            this.props.dataValue
+            )
+            )
+        );
+    else
+        return (
+            React.createElement("div", null, 
+            React.createElement("span", {className: classNames}, 
+            this.props.dataValue
+            )
+            )
+        );
     }
 });
 
@@ -39,8 +91,9 @@ var InputField = React.createClass({displayName: "InputField",
             this.props.onUserInput(event.target.value);
     },
   render: function() {
+    var classNames = mergeClassNames("form-group", this.props);
     return (
-      React.createElement("div", {className: "form-group"}, 
+      React.createElement("div", {className: classNames}, 
          isNonempty(this.props.label) ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
@@ -71,8 +124,9 @@ var DateField = React.createClass({displayName: "DateField",
         }
     },
   render: function() {
+    var classNames = mergeClassNames("form-group", this.props);
     return (
-      React.createElement("div", {className: "form-group"}, 
+      React.createElement("div", {className: classNames}, 
          isNonempty(this.props.label) ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
@@ -99,8 +153,9 @@ var SelectField = React.createClass({displayName: "SelectField",
             this.props.onUserInput(event.target.value);
     },
     render: function(){
+    var classNames = mergeClassNames("form-group", this.props);
       return (
-      React.createElement("div", {className: "form-group"}, 
+      React.createElement("div", {className: classNames}, 
          isNonempty(this.props.label) ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
@@ -147,8 +202,9 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
     },
   render: function() {
     var component = this;
+    var classNames = mergeClassNames("input-group", this.props);
     return (
-      React.createElement("div", {className: "input-group"}, 
+      React.createElement("div", {className: classNames}, 
          isNonempty(this.props.label) ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
@@ -297,66 +353,55 @@ var Form = React.createClass({displayName: "Form",
             var onUserInput = getHandleChangeFunc(itemSpec.id);
             if (type == 'select') {
                 return (
-                React.createElement(SelectField, {
-                    id: itemSpec.id, 
-                    key: index, 
-                    options: itemSpec.options, 
+                React.createElement(SelectField, React.__spread({}, 
+                   itemSpec, 
+                    {key: index, 
                     dataValue: getFallbackVal(component.state, defaultVals, itemSpec.id), 
-                    label: itemSpec.label, 
                     onUserInput: onUserInput
-                }
+                })
                 )
                 );
             }
             else if (type == 'checkboxes') {
                 return (
-                React.createElement(CheckboxesField, {
-                    id: itemSpec.id, 
-                    key: index, 
-                    options: itemSpec.options, 
+                React.createElement(CheckboxesField, React.__spread({}, 
+                   itemSpec, 
+                    {key: index, 
                     dataValue: getFallbackVal(component.state, defaultVals, itemSpec.id), 
-                    label: itemSpec.label, 
                     onUserInput: onUserInput
-                }
+                })
                 )
                 );
             }
             else if (type == 'label') {
                 return (
-                React.createElement(LabelField, {
-                    id: itemSpec.id, 
-                    key: index, 
-                    type: itemSpec.subtype, 
+                React.createElement(LabelField, React.__spread({}, 
+                   itemSpec, 
+                    {key: index, 
                     dataValue: getFallbackVal(component.state, defaultVals, itemSpec.id)
-                }
+                })
                 )
                 );
             }
             else if (type == 'date') {
                 return (
-                React.createElement(DateField, {
-                    id: itemSpec.id, 
-                    key: index, 
-                    label: itemSpec.label, 
-                    placeHolder: itemSpec.placeHolder, 
+                React.createElement(DateField, React.__spread({}, 
+                   itemSpec, 
+                    {key: index, 
                     dataValue: getFallbackVal(component.state, defaultVals, itemSpec.id), 
                     onUserInput: onUserInput
-                }
+                })
                 )
                 );
             }
             else {
                 return (
-                React.createElement(InputField, {
-                    id: itemSpec.id, 
-                    key: index, 
-                    label: itemSpec.label, 
-                    preaddon: itemSpec.preaddon, 
-                    postaddon: itemSpec.postaddon, 
-                    placeHolder: itemSpec.placeHolder, 
+                React.createElement(InputField, React.__spread({}, 
+                   itemSpec, 
+                    {key: index, 
                     dataValue: getFallbackVal(component.state, defaultVals, itemSpec.id), 
                     onUserInput: onUserInput
-                }
+                })
                 )
                 );
             }
