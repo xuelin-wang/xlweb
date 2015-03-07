@@ -1,7 +1,14 @@
 
 function isNonempty(str) {
-    return typeof str != undefined && str != undefined && str != null && str.trim().length > 0;
+    return str != undefined && str != null && str.trim().length > 0;
 };
+
+function getProp(obj, prop, defVal)
+{
+    if (typeof obj[prop] == undefined || obj[prop] == undefined)
+        return defVal;
+    return obj[prop];
+}
 
 var asyncCallIds = {
 };
@@ -118,26 +125,88 @@ var InputField = React.createClass({
   }
 });
 
-var SwapField = React.createClass({
+var TableField = React.createClass({
   render: function() {
-    var editSpec = this.props.editSpec;
-    var displaySpec = this.props.displaySpec;
-    var isEdit = this.props.isEdit;
-    var id = this.props.id;
 
-    var key = this.props.key;
-    var dataValue = this.props.dataValue;
-    var onUserInput = this.props.onUserInput;
+    var defaultTableHeaderRowRenderer = function(props) {
+        var header = getProp(props, 'header', ['']);
+        var headerRowClassName = getProp(props, 'headerRowClassName', '');
+        var headerColumnClassName = getProp(props, 'headerColumnClassName', '');
+        console.log("default header headerRowClassName: " + headerRowClassName + ",colClassName:" + headerColumnClassName + ",header:" + header.length);
+        return (
+          <tr key='0' className={headerRowClassName}>
+              {header.map(
+                  function(col, index, cols) {
+                  return (
+                  <td key={index} className={headerColumnClassName}>
+                  {col}
+                  </td>
+                  );
+                  }
+              )}
+          </tr>
+        );
+    };
 
-    if (isEdit) {
-        editSpec.id = id;
-        return renderBySpec(editSpec, key, dataValue, onUserInput);
-    }
-    else {
-        displaySpec.id = id;
-        displaySpec.onClick = function(event) {};
-        return renderBySpec(displaySpec, key, dataValue, onUserInput);
-    }
+    var defaultTableCellRenderer = function(rowIndex, colIndex, val, props) {
+        return (
+            <span>{val}</span>
+        );
+    };
+
+
+
+    var dataValue = getProp(this.props, 'dataValue', null);
+    var headerRenderer = getProp(this.props, 'headerRenderer', defaultTableHeaderRowRenderer);
+
+    var cellRenderer = getProp(this.props, 'cellRenderer', defaultTableCellRenderer);
+
+    var rowClassName = getProp(this.props, 'rowClassName', '');
+    var colClassName = getProp(this.props, 'columnClassName', '');
+    var header = getProp(this.props, 'header', ['']);
+
+    var renderValue = dataValue;
+    renderValue.splice(0, 0, header);
+    var component = this;
+
+    var dataRowRenderer = function(row, rowIndex, rows, props)
+    {
+         var thisColRenderer = function(col, colIndex, cols) {
+             var cell = cellRenderer(rowIndex, colIndex, col, props);
+             return (
+              <td key={colIndex} className={colClassName}>
+              {cell}
+              </td>
+              );
+         };
+
+        return (
+          <tr key={rowIndex} className={rowClassName}>
+              {row.map(thisColRenderer)}
+          </tr>
+        );
+    };
+
+    var rowRenderer = function(row, index, rows) {
+        if (index == 0)
+         return headerRenderer(component.props);
+        else
+          return dataRowRenderer(row, index, rows, component.props);
+    };
+
+    var divId = 'div_' + this.props.id;
+    var classNames = mergeClassNames("form-group", this.props);
+    var tableClassNames = getProp(this.props, 'tableClassName', '');
+    return (
+      <div {...this.props} id={divId} className={classNames}>
+        { isNonempty(this.props.label) ?
+        <label htmlFor={this.props.id}>{this.props.label}</label>
+        : null }
+        <table {...this.props} className={tableClassNames}>
+        {dataValue.map(rowRenderer)}
+        </table>
+      </div>
+        );
   }
 });
 
@@ -195,7 +264,7 @@ var SelectField = React.createClass({
       >
       {this.props.options.map(function(opt, index, arr) {
         return (
-        <option key={index} value={opt.value}>{opt.hasOwnProperty('label') ? opt.label : opt.value}</option>
+        <option key={index} value={opt.value}>{getProp(opt, 'label', opt.value)}</option>
         );
       })
       }
@@ -283,7 +352,7 @@ function getDefaultValsFromSpec(theSpec)
     for (var index = 0; index < theSpec.length; index++) {
         var itemSpec = theSpec[index];
         var id = itemSpec.id;
-        if (itemSpec.hasOwnProperty('defaultValue'))
+        if (getProp(itemSpec, 'defaultValue', null) != null)
             defaultVals[id] = itemSpec.defaultValue;
         else
             defaultVals[id] = '';
@@ -293,12 +362,9 @@ function getDefaultValsFromSpec(theSpec)
 
 function getFallbackVal(vals, defaultVals, id)
 {
-    if (vals.hasOwnProperty(id))
+    if (getProp(vals, id, null) != null)
         return vals[id];
-    else if (defaultVals.hasOwnProperty(id))
-        return defaultVals[id];
-    else
-        return null;
+    return getProp(defaultVals, id, null);
 }
 
 function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
@@ -347,7 +413,18 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
         </DateField>
         );
     }
-    else {
+    else if (type == 'table') {
+        return (
+        <TableField
+           {...itemSpec}
+            key={childKey}
+            dataValue={dataValue}
+            onUserInput = {onUserInput}
+        >
+        </TableField>
+        );
+    }
+    else if (type == 'input') {
         return (
         <InputField
            {...itemSpec}
@@ -358,7 +435,11 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
         </InputField>
         );
     }
+    else {
+        throw 'Invalid type: ' + type;
+    }
 }
+
 
 var Form = React.createClass({
     getInitialState: function() {
@@ -377,7 +458,8 @@ var Form = React.createClass({
         deltaState[updateId] = updateVal;
         component.setState(deltaState);
 
-        if (component.props.hasOwnProperty('url') && component.props.url != undefined && component.props.url != null) {
+        var url = getProp(component, 'url', null);
+        if (url != null) {
             var userData = {};
             for (var index = 0; index < theSpec.length; index++) {
                 var itemSpec = theSpec[index];
@@ -390,15 +472,11 @@ var Form = React.createClass({
 
             var userDataStr = JSON.stringify(userData);
 
-            var newCallId;
-            if (!asyncCallIds.hasOwnProperty(thisId))
-                newCallId = 0;
-            else
-                newCallId = asyncCallIds[thisId] + 1;
-
+            var newCallId = getProp(asyncCallIds, thisId, 0) + 1;
             asyncCallIds[thisId] = newCallId;
-            if (component.props.hasOwnProperty('willAjax') && component.props.willAjax != undefined && component.props.willAjax != null) {
-                component.props.willAjax(userData);
+            var willAjax = getProp(component.props, 'willAjax', null);
+            if (willAjax != null) {
+                willAjax(userData);
             }
 
             $.ajax(
@@ -408,16 +486,18 @@ var Form = React.createClass({
                     error: function(xhr, textStatus, errorThrown) {
                         if (asyncCallIds[thisId] > newCallId)
                           return;
-                        if (component.props.hasOwnProperty('error') && component.props.error != undefined && component.props.error != null) {
-                            component.props.error(xhr, textStatus, errorThrown);
+                        var error = getProp(component.props, 'error', null);
+                        if (error != null) {
+                            error(xhr, textStatus, errorThrown);
                         }
                     },
                     success:
                         function(result, textStatus, xhr){
                             if (asyncCallIds[thisId] > newCallId)
                               return;
-                            if (component.props.hasOwnProperty('success') && component.props.success != undefined && component.props.success != null) {
-                                component.props.success(result, textStatus, xhr);
+                            var success = getProp(component.props, 'success', null);
+                            if (success != null) {
+                                success(result, textStatus, xhr);
                             }
                        }
                 });

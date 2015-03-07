@@ -20,7 +20,7 @@
 
     <script src="react/react.js"></script>
     <script src="moment/min/moment.min.js"></script>
-    <script src="react/react-with-addons.min.js"></script>
+    <script src="react/react-with-addons.js"></script>
     <script src="tether/tether.min.js"></script>
 
     <script src="react-datepicker/react-datepicker.js"></script>
@@ -86,6 +86,16 @@
 
 
 var spec=[
+    {
+        id: 'param6',
+        label: 'Look, Ma, a table!',
+        type: 'table',
+        header: ['Column 1', 'Column 2', 'Column 3'],
+        defaultValue: [
+          ['a', 'b', 'c'],
+          ['aa', 'bb', 'cc']
+        ]
+    },
     {
         id: 'param0',
         type: 'input',

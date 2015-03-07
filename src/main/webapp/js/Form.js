@@ -1,7 +1,14 @@
 
 function isNonempty(str) {
-    return typeof str != undefined && str != undefined && str != null && str.trim().length > 0;
+    return str != undefined && str != null && str.trim().length > 0;
 };
+
+function getProp(obj, prop, defVal)
+{
+    if (typeof obj[prop] == undefined || obj[prop] == undefined)
+        return defVal;
+    return obj[prop];
+}
 
 var asyncCallIds = {
 };
@@ -118,26 +125,88 @@ var InputField = React.createClass({displayName: "InputField",
   }
 });
 
-var SwapField = React.createClass({displayName: "SwapField",
+var TableField = React.createClass({displayName: "TableField",
   render: function() {
-    var editSpec = this.props.editSpec;
-    var displaySpec = this.props.displaySpec;
-    var isEdit = this.props.isEdit;
-    var id = this.props.id;
 
-    var key = this.props.key;
-    var dataValue = this.props.dataValue;
-    var onUserInput = this.props.onUserInput;
+    var defaultTableHeaderRowRenderer = function(props) {
+        var header = getProp(props, 'header', ['']);
+        var headerRowClassName = getProp(props, 'headerRowClassName', '');
+        var headerColumnClassName = getProp(props, 'headerColumnClassName', '');
+        console.log("default header headerRowClassName: " + headerRowClassName + ",colClassName:" + headerColumnClassName + ",header:" + header.length);
+        return (
+          React.createElement("tr", {key: "0", className: headerRowClassName}, 
+              header.map(
+                  function(col, index, cols) {
+                  return (
+                  React.createElement("td", {key: index, className: headerColumnClassName}, 
+                  col
+                  )
+                  );
+                  }
+              )
+          )
+        );
+    };
 
-    if (isEdit) {
-        editSpec.id = id;
-        return renderBySpec(editSpec, key, dataValue, onUserInput);
-    }
-    else {
-        displaySpec.id = id;
-        displaySpec.onClick = function(event) {};
-        return renderBySpec(displaySpec, key, dataValue, onUserInput);
-    }
+    var defaultTableCellRenderer = function(rowIndex, colIndex, val, props) {
+        return (
+            React.createElement("span", null, val)
+        );
+    };
+
+
+
+    var dataValue = getProp(this.props, 'dataValue', null);
+    var headerRenderer = getProp(this.props, 'headerRenderer', defaultTableHeaderRowRenderer);
+
+    var cellRenderer = getProp(this.props, 'cellRenderer', defaultTableCellRenderer);
+
+    var rowClassName = getProp(this.props, 'rowClassName', '');
+    var colClassName = getProp(this.props, 'columnClassName', '');
+    var header = getProp(this.props, 'header', ['']);
+
+    var renderValue = dataValue;
+    renderValue.splice(0, 0, header);
+    var component = this;
+
+    var dataRowRenderer = function(row, rowIndex, rows, props)
+    {
+         var thisColRenderer = function(col, colIndex, cols) {
+             var cell = cellRenderer(rowIndex, colIndex, col, props);
+             return (
+              React.createElement("td", {key: colIndex, className: colClassName}, 
+              cell
+              )
+              );
+         };
+
+        return (
+          React.createElement("tr", {key: rowIndex, className: rowClassName}, 
+              row.map(thisColRenderer)
+          )
+        );
+    };
+
+    var rowRenderer = function(row, index, rows) {
+        if (index == 0)
+         return headerRenderer(component.props);
+        else
+          return dataRowRenderer(row, index, rows, component.props);
+    };
+
+    var divId = 'div_' + this.props.id;
+    var classNames = mergeClassNames("form-group", this.props);
+    var tableClassNames = getProp(this.props, 'tableClassName', '');
+    return (
+      React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
+         isNonempty(this.props.label) ?
+        React.createElement("label", {htmlFor: this.props.id}, this.props.label)
+        : null, 
+        React.createElement("table", React.__spread({},  this.props, {className: tableClassNames}), 
+        dataValue.map(rowRenderer)
+        )
+      )
+        );
   }
 });
 
@@ -195,7 +264,7 @@ React.createElement("div", {className: "select2-wrapper"},
       }, 
       this.props.options.map(function(opt, index, arr) {
         return (
-        React.createElement("option", {key: index, value: opt.value}, opt.hasOwnProperty('label') ? opt.label : opt.value)
+        React.createElement("option", {key: index, value: opt.value}, getProp(opt, 'label', opt.value))
         );
       })
       
@@ -283,7 +352,7 @@ function getDefaultValsFromSpec(theSpec)
     for (var index = 0; index < theSpec.length; index++) {
         var itemSpec = theSpec[index];
         var id = itemSpec.id;
-        if (itemSpec.hasOwnProperty('defaultValue'))
+        if (getProp(itemSpec, 'defaultValue', null) != null)
             defaultVals[id] = itemSpec.defaultValue;
         else
             defaultVals[id] = '';
@@ -293,12 +362,9 @@ function getDefaultValsFromSpec(theSpec)
 
 function getFallbackVal(vals, defaultVals, id)
 {
-    if (vals.hasOwnProperty(id))
+    if (getProp(vals, id, null) != null)
         return vals[id];
-    else if (defaultVals.hasOwnProperty(id))
-        return defaultVals[id];
-    else
-        return null;
+    return getProp(defaultVals, id, null);
 }
 
 function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
@@ -347,7 +413,18 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
         )
         );
     }
-    else {
+    else if (type == 'table') {
+        return (
+        React.createElement(TableField, React.__spread({}, 
+           itemSpec, 
+            {key: childKey, 
+            dataValue: dataValue, 
+            onUserInput: onUserInput
+        })
+        )
+        );
+    }
+    else if (type == 'input') {
         return (
         React.createElement(InputField, React.__spread({}, 
            itemSpec, 
@@ -358,7 +435,11 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
         )
         );
     }
+    else {
+        throw 'Invalid type: ' + type;
+    }
 }
+
 
 var Form = React.createClass({displayName: "Form",
     getInitialState: function() {
@@ -377,7 +458,8 @@ var Form = React.createClass({displayName: "Form",
         deltaState[updateId] = updateVal;
         component.setState(deltaState);
 
-        if (component.props.hasOwnProperty('url') && component.props.url != undefined && component.props.url != null) {
+        var url = getProp(component, 'url', null);
+        if (url != null) {
             var userData = {};
             for (var index = 0; index < theSpec.length; index++) {
                 var itemSpec = theSpec[index];
@@ -390,15 +472,11 @@ var Form = React.createClass({displayName: "Form",
 
             var userDataStr = JSON.stringify(userData);
 
-            var newCallId;
-            if (!asyncCallIds.hasOwnProperty(thisId))
-                newCallId = 0;
-            else
-                newCallId = asyncCallIds[thisId] + 1;
-
+            var newCallId = getProp(asyncCallIds, thisId, 0) + 1;
             asyncCallIds[thisId] = newCallId;
-            if (component.props.hasOwnProperty('willAjax') && component.props.willAjax != undefined && component.props.willAjax != null) {
-                component.props.willAjax(userData);
+            var willAjax = getProp(component.props, 'willAjax', null);
+            if (willAjax != null) {
+                willAjax(userData);
             }
 
             $.ajax(
@@ -408,16 +486,18 @@ var Form = React.createClass({displayName: "Form",
                     error: function(xhr, textStatus, errorThrown) {
                         if (asyncCallIds[thisId] > newCallId)
                           return;
-                        if (component.props.hasOwnProperty('error') && component.props.error != undefined && component.props.error != null) {
-                            component.props.error(xhr, textStatus, errorThrown);
+                        var error = getProp(component.props, 'error', null);
+                        if (error != null) {
+                            error(xhr, textStatus, errorThrown);
                         }
                     },
                     success:
                         function(result, textStatus, xhr){
                             if (asyncCallIds[thisId] > newCallId)
                               return;
-                            if (component.props.hasOwnProperty('success') && component.props.success != undefined && component.props.success != null) {
-                                component.props.success(result, textStatus, xhr);
+                            var success = getProp(component.props, 'success', null);
+                            if (success != null) {
+                                success(result, textStatus, xhr);
                             }
                        }
                 });
