@@ -165,7 +165,7 @@ var TableField = React.createClass({
     var colClassName = getProp(this.props, 'columnClassName', '');
     var header = getProp(this.props, 'header', ['']);
 
-    var renderValue = dataValue;
+    var renderValue = dataValue.slice(0);//clone, may be expensive for large array!!
     renderValue.splice(0, 0, header);
     var component = this;
 
@@ -458,7 +458,7 @@ var Form = React.createClass({
         deltaState[updateId] = updateVal;
         component.setState(deltaState);
 
-        var url = getProp(component, 'url', null);
+        var url = getProp(component.props, 'url', null);
         if (url != null) {
             var userData = {};
             for (var index = 0; index < theSpec.length; index++) {
@@ -481,7 +481,7 @@ var Form = React.createClass({
 
             $.ajax(
                 {
-                    url: component.props.url + "?userData=" + encodeURIComponent(userDataStr),
+                    url: url + "?userData=" + encodeURIComponent(userDataStr),
                     dataType: component.props.dataType,
                     error: function(xhr, textStatus, errorThrown) {
                         if (asyncCallIds[thisId] > newCallId)

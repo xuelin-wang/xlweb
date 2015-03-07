@@ -332,8 +332,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/js/Form.js" afterPath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/js/Form.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/jsx/Form.js" afterPath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/jsx/Form.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/test-react.html" afterPath="$PROJECT_DIR$/src/main/webapp/test-react.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/test-react.html" afterPath="$PROJECT_DIR$/target/wendocs-1.0-SNAPSHOT/test-react.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="wendocs.iws" />
@@ -383,8 +381,8 @@
       <file leaf-file-name="Form.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/jsx/Form.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.18539326" vertical-offset="2808" max-vertical-offset="7995">
-              <caret line="196" column="39" selection-start-line="196" selection-start-column="39" selection-end-line="196" selection-end-column="39" />
+            <state vertical-scroll-proportion="0.12219101" vertical-offset="7158" max-vertical-offset="7995">
+              <caret line="483" column="28" selection-start-line="483" selection-start-column="28" selection-end-line="483" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -1278,8 +1276,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/webapp/jsx/Form.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18539326" vertical-offset="2808" max-vertical-offset="7995">
-          <caret line="196" column="39" selection-start-line="196" selection-start-column="39" selection-end-line="196" selection-end-column="39" />
+        <state vertical-scroll-proportion="0.12219101" vertical-offset="7158" max-vertical-offset="7995">
+          <caret line="483" column="28" selection-start-line="483" selection-start-column="28" selection-end-line="483" selection-end-column="28" />
           <folding />
         </state>
       </provider>
