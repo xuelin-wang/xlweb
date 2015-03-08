@@ -504,8 +504,8 @@ var Form = React.createClass({
                 console.log('param id:' + id + ', val:' + val);
                 userData[id] = val;
             }
-//
-//            userData[updateId] = updateVal;
+
+            Object.assign(userData, deltaState); // why is this needed???
 
             var userDataStr = JSON.stringify(userData);
 
