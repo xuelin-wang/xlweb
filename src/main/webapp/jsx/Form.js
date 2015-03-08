@@ -152,9 +152,20 @@ var TableField = React.createClass({
     };
 
     var defaultTableCellRenderer = function(rowIndex, colIndex, val, props) {
-        return (
-            <span>{val}</span>
-        );
+        var cellSpecFunc = getProp(props, 'cellSpecsFunc', null);
+        var cellSpec;
+        if (cellSpecFunc != null) {
+            cellSpec = cellSpecFunc(rowIndex, colIndex);
+        }
+        if (cellSpec == null) {
+            cellSpec = {
+                type: 'label',
+                subtype: '',
+                defaultValue: ' '
+            };
+        }
+
+        return renderBySpec(cellSpec, rowIndex * 100 + colIndex, val, null/*onUserInput*/);
     };
 
 
@@ -459,8 +470,13 @@ var Form = React.createClass({
         return getProp(defaultVals, id, null);
     };
 
+    var updateData = function(data, updateSpec)
+    {
+    }
+
     var processItem = function(updateVal, updateId) {
         var deltaState = {};
+
         deltaState[updateId] = updateVal;
         component.setState(deltaState);
 

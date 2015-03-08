@@ -1,14 +1,16 @@
 
-function isNonempty(str) {
-    return str != undefined && str != null && str.trim().length > 0;
-};
-
 function getProp(obj, prop, defVal)
 {
     if (typeof obj[prop] == undefined || obj[prop] == undefined)
         return defVal;
     return obj[prop];
 }
+
+function isNonempty(obj, prop) {
+    var val = getProp(obj, prop, null);
+    return val != null && val.trim().length > 0;
+};
+
 
 var asyncCallIds = {
 };
@@ -29,9 +31,10 @@ var mergeClassNames = function(classNames, props) {
 var LabelField = React.createClass({
   render: function() {
     var classNames;
+    var typesStr = getProp(this.props, 'subtype', null);
     var types;
-    if ('type' in this.props)
-      types = this.props.subtype.split(" ");
+    if (typesStr != null && typesStr.trim().length > 0)
+      types = typesStr.split(" ");
     else
       types = [];
 
@@ -102,11 +105,11 @@ var InputField = React.createClass({
     var divId = 'div_' + this.props.id;
     return (
       <div {...this.props} id={divId} className={classNames}>
-        { isNonempty(this.props.label) ?
+        { isNonempty(this.props,'label') ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
         <div className="input-group">
-        { isNonempty(this.props.preaddon) ?
+        { isNonempty(this.props, 'preaddon') ?
         <span className="input-group-addon">{this.props.preaddon}</span>
         : null }
         <input
@@ -116,7 +119,7 @@ var InputField = React.createClass({
             value={this.props.dataValue} id={this.props.id} placeholder={this.props.placeHolder}
             >
         </input>
-        { isNonempty(this.props.postaddon) ?
+        { isNonempty(this.props, 'postaddon') ?
         <span className="input-group-addon">{this.props.postaddon}</span>
         : null }
         </div>
@@ -149,9 +152,20 @@ var TableField = React.createClass({
     };
 
     var defaultTableCellRenderer = function(rowIndex, colIndex, val, props) {
-        return (
-            <span>{val}</span>
-        );
+        var cellSpecFunc = getProp(props, 'cellSpecsFunc', null);
+        var cellSpec;
+        if (cellSpecFunc != null) {
+            cellSpec = cellSpecFunc(rowIndex, colIndex);
+        }
+        if (cellSpec == null) {
+            cellSpec = {
+                type: 'label',
+                subtype: '',
+                defaultValue: ' '
+            };
+        }
+
+        return renderBySpec(cellSpec, rowIndex * 100 + colIndex, val, null/*onUserInput*/);
     };
 
 
@@ -199,7 +213,7 @@ var TableField = React.createClass({
     var tableClassNames = getProp(this.props, 'tableClassName', '');
     return (
       <div {...this.props} id={divId} className={classNames}>
-        { isNonempty(this.props.label) ?
+        { isNonempty(this.props, 'label') ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
         <table {...this.props} className={tableClassNames}>
@@ -221,7 +235,7 @@ var DateField = React.createClass({
     var divId = "div_" + this.props.id;
     return (
       <div {...this.props} id={divId} className={classNames}>
-        { isNonempty(this.props.label) ?
+        { isNonempty(this.props, 'label') ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
         <div className="input-group">
@@ -251,7 +265,7 @@ var SelectField = React.createClass({
     var divId = 'div_' + this.props.id;
       return (
       <div {...this.props} id={divId}  className={classNames}>
-        { isNonempty(this.props.label) ?
+        { isNonempty(this.props, 'label') ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
 <div className="select2-wrapper">
@@ -301,7 +315,7 @@ var CheckboxesField = React.createClass({
     var divId = 'div_' + this.props.id;
     return (
       <div {...this.props} id={divId} className={classNames}>
-        { isNonempty(this.props.label) ?
+        { isNonempty(this.props, 'label') ?
         <label htmlFor={this.props.id}>{this.props.label}</label>
         : null }
 
@@ -320,7 +334,7 @@ var CheckboxesField = React.createClass({
 
                 return (
                 <label className='input-group' key={index}>
-        { isNonempty(opt.preaddon) ?
+        { isNonempty(opt, 'preaddon') ?
         <span className="input-group-addon">{opt.preaddon}</span>
         : null }
 
@@ -331,7 +345,7 @@ var CheckboxesField = React.createClass({
             >
         </input>
 
-        { isNonempty(opt.postaddon) ?
+        { isNonempty(opt, 'postaddon') ?
         <span className="input-group-addon">{opt.postaddon}</span>
         : null }
                 </label>
@@ -423,7 +437,6 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
 var Form = React.createClass({
     getInitialState: function() {
         return {
-            '_last':{}
         };
     },
 

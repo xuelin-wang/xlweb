@@ -2,3 +2,11 @@
     background:rgba(0,0,0,0);
     border:none;
 }
+
+table, th, td {
+    border: 1px solid black;
+}
+
+.text-align-center {
+    text-align: center
+}

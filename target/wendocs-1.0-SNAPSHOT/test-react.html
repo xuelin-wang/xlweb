@@ -84,6 +84,22 @@
 
 <script  type="text/javascript">
 
+var cellSpecsFunc = function(rowIndex, colIndex) {
+    var id = 'param6_' + (rowIndex * 100 + colIndex);
+    if (colIndex == 2) {
+        return {
+            id: id,
+            type: 'input'
+        };
+    }
+    else
+        return {
+            id: id,
+            type: 'label',
+            subtype: '',
+            defaultValue: ' '
+        }
+};
 
 var spec=[
     {
@@ -91,10 +107,12 @@ var spec=[
         label: 'Look, Ma, a table!',
         type: 'table',
         header: ['Column 1', 'Column 2', 'Column 3'],
+        columnClassName: 'text-align-center',
         defaultValue: [
           ['a', 'b', 'c'],
           ['aa', 'bb', 'cc']
-        ]
+        ],
+        cellSpecsFunc: cellSpecsFunc
     },
     {
         id: 'param0',
