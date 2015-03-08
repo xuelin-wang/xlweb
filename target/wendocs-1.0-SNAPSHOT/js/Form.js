@@ -203,7 +203,7 @@ var TableField = React.createClass({displayName: "TableField",
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
         React.createElement("table", React.__spread({},  this.props, {className: tableClassNames}), 
-        dataValue.map(rowRenderer)
+        renderValue.map(rowRenderer)
         )
       )
         );
@@ -346,27 +346,6 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
 
 
 
-function getDefaultValsFromSpec(theSpec)
-{
-    var defaultVals = {};
-    for (var index = 0; index < theSpec.length; index++) {
-        var itemSpec = theSpec[index];
-        var id = itemSpec.id;
-        if (getProp(itemSpec, 'defaultValue', null) != null)
-            defaultVals[id] = itemSpec.defaultValue;
-        else
-            defaultVals[id] = '';
-    }
-    return defaultVals;
-}
-
-function getFallbackVal(vals, defaultVals, id)
-{
-    if (getProp(vals, id, null) != null)
-        return vals[id];
-    return getProp(defaultVals, id, null);
-}
-
 function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
 {
     var type = itemSpec.type;
@@ -444,15 +423,40 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
 var Form = React.createClass({displayName: "Form",
     getInitialState: function() {
         return {
+            '_last':{}
         };
     },
 
+    getDefaultValsFromSpec: function(theSpec)
+    {
+        var defaultVals = {};
+        for (var index = 0; index < theSpec.length; index++) {
+            var itemSpec = theSpec[index];
+            var id = itemSpec.id;
+            if (getProp(itemSpec, 'defaultValue', null) != null)
+                defaultVals[id] = itemSpec.defaultValue;
+            else
+                defaultVals[id] = '';
+        }
+        return defaultVals;
+    },
+
+
   render: function() {
     var theSpec = this.props.spec;
-    var defaultVals = getDefaultValsFromSpec(theSpec);
+    var defaultVals = this.getDefaultValsFromSpec(theSpec);
     var thisId = this.props.id;
 
     var component = this;
+
+
+    var getFallbackVal = function(vals, defaultVals, id)
+    {
+        if (getProp(vals, id, null) != null)
+            return vals[id];
+        return getProp(defaultVals, id, null);
+    };
+
     var processItem = function(updateVal, updateId) {
         var deltaState = {};
         deltaState[updateId] = updateVal;

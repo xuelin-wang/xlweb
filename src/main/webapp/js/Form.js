@@ -1,14 +1,16 @@
 
-function isNonempty(str) {
-    return str != undefined && str != null && str.trim().length > 0;
-};
-
 function getProp(obj, prop, defVal)
 {
     if (typeof obj[prop] == undefined || obj[prop] == undefined)
         return defVal;
     return obj[prop];
 }
+
+function isNonempty(obj, prop) {
+    var val = getProp(obj, prop, null);
+    return val != null && val.trim().length > 0;
+};
+
 
 var asyncCallIds = {
 };
@@ -29,9 +31,10 @@ var mergeClassNames = function(classNames, props) {
 var LabelField = React.createClass({displayName: "LabelField",
   render: function() {
     var classNames;
+    var typesStr = getProp(this.props, 'subtype', null);
     var types;
-    if ('type' in this.props)
-      types = this.props.subtype.split(" ");
+    if (typesStr != null && typesStr.trim().length > 0)
+      types = typesStr.split(" ");
     else
       types = [];
 
@@ -102,11 +105,11 @@ var InputField = React.createClass({displayName: "InputField",
     var divId = 'div_' + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
-         isNonempty(this.props.label) ?
+         isNonempty(this.props,'label') ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
         React.createElement("div", {className: "input-group"}, 
-         isNonempty(this.props.preaddon) ?
+         isNonempty(this.props, 'preaddon') ?
         React.createElement("span", {className: "input-group-addon"}, this.props.preaddon)
         : null, 
         React.createElement("input", {
@@ -116,7 +119,7 @@ var InputField = React.createClass({displayName: "InputField",
             value: this.props.dataValue, id: this.props.id, placeholder: this.props.placeHolder
             }
         ), 
-         isNonempty(this.props.postaddon) ?
+         isNonempty(this.props, 'postaddon') ?
         React.createElement("span", {className: "input-group-addon"}, this.props.postaddon)
         : null
         )
@@ -199,11 +202,11 @@ var TableField = React.createClass({displayName: "TableField",
     var tableClassNames = getProp(this.props, 'tableClassName', '');
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
-         isNonempty(this.props.label) ?
+         isNonempty(this.props, 'label') ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
         React.createElement("table", React.__spread({},  this.props, {className: tableClassNames}), 
-        dataValue.map(rowRenderer)
+        renderValue.map(rowRenderer)
         )
       )
         );
@@ -221,7 +224,7 @@ var DateField = React.createClass({displayName: "DateField",
     var divId = "div_" + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
-         isNonempty(this.props.label) ?
+         isNonempty(this.props, 'label') ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
         React.createElement("div", {className: "input-group"}, 
@@ -251,7 +254,7 @@ var SelectField = React.createClass({displayName: "SelectField",
     var divId = 'div_' + this.props.id;
       return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
-         isNonempty(this.props.label) ?
+         isNonempty(this.props, 'label') ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
 React.createElement("div", {className: "select2-wrapper"}, 
@@ -301,7 +304,7 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
     var divId = 'div_' + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
-         isNonempty(this.props.label) ?
+         isNonempty(this.props, 'label') ?
         React.createElement("label", {htmlFor: this.props.id}, this.props.label)
         : null, 
 
@@ -320,7 +323,7 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
 
                 return (
                 React.createElement("label", {className: "input-group", key: index}, 
-         isNonempty(opt.preaddon) ?
+         isNonempty(opt, 'preaddon') ?
         React.createElement("span", {className: "input-group-addon"}, opt.preaddon)
         : null, 
 
@@ -331,7 +334,7 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
             }
         ), 
 
-         isNonempty(opt.postaddon) ?
+         isNonempty(opt, 'postaddon') ?
         React.createElement("span", {className: "input-group-addon"}, opt.postaddon)
         : null
                 )
@@ -345,27 +348,6 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
 });
 
 
-
-function getDefaultValsFromSpec(theSpec)
-{
-    var defaultVals = {};
-    for (var index = 0; index < theSpec.length; index++) {
-        var itemSpec = theSpec[index];
-        var id = itemSpec.id;
-        if (getProp(itemSpec, 'defaultValue', null) != null)
-            defaultVals[id] = itemSpec.defaultValue;
-        else
-            defaultVals[id] = '';
-    }
-    return defaultVals;
-}
-
-function getFallbackVal(vals, defaultVals, id)
-{
-    if (getProp(vals, id, null) != null)
-        return vals[id];
-    return getProp(defaultVals, id, null);
-}
 
 function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
 {
@@ -447,12 +429,36 @@ var Form = React.createClass({displayName: "Form",
         };
     },
 
+    getDefaultValsFromSpec: function(theSpec)
+    {
+        var defaultVals = {};
+        for (var index = 0; index < theSpec.length; index++) {
+            var itemSpec = theSpec[index];
+            var id = itemSpec.id;
+            if (getProp(itemSpec, 'defaultValue', null) != null)
+                defaultVals[id] = itemSpec.defaultValue;
+            else
+                defaultVals[id] = '';
+        }
+        return defaultVals;
+    },
+
+
   render: function() {
     var theSpec = this.props.spec;
-    var defaultVals = getDefaultValsFromSpec(theSpec);
+    var defaultVals = this.getDefaultValsFromSpec(theSpec);
     var thisId = this.props.id;
 
     var component = this;
+
+
+    var getFallbackVal = function(vals, defaultVals, id)
+    {
+        if (getProp(vals, id, null) != null)
+            return vals[id];
+        return getProp(defaultVals, id, null);
+    };
+
     var processItem = function(updateVal, updateId) {
         var deltaState = {};
         deltaState[updateId] = updateVal;
