@@ -3,8 +3,19 @@
     border:none;
 }
 
-table, th, td {
+.table-border table, th, td {
     border: 1px solid black;
+}
+
+.table-default table {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.table-default td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .text-align-center {
