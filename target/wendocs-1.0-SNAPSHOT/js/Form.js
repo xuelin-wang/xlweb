@@ -206,8 +206,11 @@ var TableField = React.createClass({displayName: "TableField",
               );
          };
 
+        var bgColorClassName = rowIndex % 2 == 0 ? 'table-alternate-row-light' : 'table-alternate-row-dark';
+        var rowClassNameBg = rowClassName == '' ? bgColorClassName : (rowClassName + ' ' + bgColorClassName);
+
         return (
-          React.createElement("tr", {key: rowIndex, className: rowClassName}, 
+          React.createElement("tr", {key: rowIndex, className: rowClassNameBg}, 
               row.map(thisColRenderer)
           )
         );

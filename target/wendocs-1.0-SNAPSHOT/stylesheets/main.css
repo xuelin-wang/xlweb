@@ -21,3 +21,11 @@
 .text-align-center {
     text-align: center
 }
+
+.table-alternate-row-light{
+    background-color:#fff;
+}
+
+.table-alternate-row-dark{
+    background-color:#eee;
+}
