@@ -169,7 +169,7 @@ var TableField = React.createClass({
             var getDeltaData = function(data, updateId, updateVal) {
                 var retval = {};
                 var dataVal = getProp(data, updateId, props.defaultValue);
-                dataVal[rowIndex - 1][colIndex] = updateVal;
+                dataVal[rowIndex][colIndex] = updateVal;
                 retval[updateId] = dataVal;
                 return retval;
             };
@@ -196,8 +196,9 @@ var TableField = React.createClass({
 
     var dataRowRenderer = function(row, rowIndex, rows, props)
     {
+        var dataRowIndex = rowIndex - 1;
          var thisColRenderer = function(col, colIndex, cols) {
-             var cell = cellRenderer(rowIndex, colIndex, col, props);
+             var cell = cellRenderer(dataRowIndex, colIndex, col, props);
              return (
               <td key={colIndex} className={colClassName}>
               {cell}
@@ -517,7 +518,9 @@ var Form = React.createClass({
 
             $.ajax(
                 {
-                    url: url + "?userData=" + encodeURIComponent(userDataStr),
+                    url: url,
+                    data: {'userData': userDataStr},
+                    type: 'POST',
                     dataType: component.props.dataType,
                     error: function(xhr, textStatus, errorThrown) {
                         if (asyncCallIds[thisId] > newCallId)
@@ -547,7 +550,7 @@ var Form = React.createClass({
         return f;
     };
   return (
-    <form>
+    <form {...this.props}>
     {this.props.spec.map(
         function(itemSpec, index, arr) {
             var onUserInput = getHandleChangeFunc(itemSpec.id);

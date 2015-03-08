@@ -84,9 +84,28 @@
 
 <script  type="text/javascript">
 
+var tableHeader = [];
+for (var colIndex = 0; colIndex < 20; colIndex++) {
+    tableHeader.push('Column ' + colIndex);
+}
+
+var initialTableVals = [];
+for (var rowIndex = 0; rowIndex < 10; rowIndex++) {
+    var row = [];
+    for (var colIndex = 0; colIndex < 20; colIndex++) {
+        var col;
+        if (colIndex == 18 || colIndex == 17 && rowIndex % 2 == 0)
+            col = 'Editable value ' + rowIndex + ' ' + colIndex;
+        else
+            col = 'Value ' + rowIndex + ' ' + colIndex;
+        row.push(col);
+    }
+    initialTableVals.push(row);
+}
+
 var cellSpecsFunc = function(rowIndex, colIndex) {
     var id = 'param6_' + (rowIndex * 100 + colIndex);
-    if (colIndex == 2) {
+    if (colIndex == 18 || colIndex == 17 && rowIndex % 2 == 0) {
         return {
             id: id,
             type: 'input'
@@ -97,23 +116,11 @@ var cellSpecsFunc = function(rowIndex, colIndex) {
             id: id,
             type: 'label',
             subtype: '',
-            defaultValue: ' '
+            defaultValue: ''
         }
 };
 
 var spec=[
-    {
-        id: 'param6',
-        label: 'Look, Ma, a table!',
-        type: 'table',
-        header: ['Column 1', 'Column 2', 'Column 3'],
-        columnClassName: 'text-align-center',
-        defaultValue: [
-          ['a', 'b', 'c'],
-          ['aa', 'bb', 'cc']
-        ],
-        cellSpecsFunc: cellSpecsFunc
-    },
     {
         id: 'param0',
         type: 'input',
@@ -192,6 +199,15 @@ var spec=[
         className: 'form-group',
         label: 'Date Field',
         placeHolder: 'Click to enter date'
+    },
+    {
+        id: 'param6',
+        label: 'Look, Ma, a table!',
+        type: 'table',
+        header: tableHeader,
+        columnClassName: 'text-align-center',
+        defaultValue: initialTableVals,
+        cellSpecsFunc: cellSpecsFunc
     }
 ];
 

@@ -29,22 +29,6 @@ public class InvokeServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        doGet(req, resp);
-    }
-
-    private String[] objsToStrs(Object[] params)
-    {
-        if (params == null)
-            return null;
-        String[] paramStrs = new String[params.length];
-        for (int index = 0; index < params.length; index++)
-            paramStrs[index] = String.valueOf(params[index]);
-        return paramStrs;
-    }
-
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
         String userData = req.getParameter("userData");
         JSONObject userDataJson = new JSONObject(userData);
         String result = null;
@@ -81,6 +65,22 @@ public class InvokeServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         out.append(result);
         out.close();
+    }
+
+    private String[] objsToStrs(Object[] params)
+    {
+        if (params == null)
+            return null;
+        String[] paramStrs = new String[params.length];
+        for (int index = 0; index < params.length; index++)
+            paramStrs[index] = String.valueOf(params[index]);
+        return paramStrs;
+    }
+
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        doPost(req, resp);
     }
 
     private String concatParams(String... params)
