@@ -101,7 +101,7 @@ var InputField = React.createClass({displayName: "InputField",
             this.props.onUserInput(event.target.value);
     },
   render: function() {
-    var classNames = mergeClassNames("form-group", this.props);
+    var classNames = mergeClassNames(null, this.props);
     var divId = 'div_' + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
@@ -165,7 +165,18 @@ var TableField = React.createClass({displayName: "TableField",
             };
         }
 
-        return renderBySpec(cellSpec, rowIndex * 100 + colIndex, val, null/*onUserInput*/);
+        var onUserInput = function(val) {
+            var getDeltaData = function(data, updateId, updateVal) {
+                var retval = {};
+                var dataVal = getProp(data, updateId, props.defaultValue);
+                dataVal[rowIndex - 1][colIndex] = updateVal;
+                retval[updateId] = dataVal;
+                return retval;
+            };
+            return props.processDataUpdate(props.id, val, getDeltaData);
+        };
+
+        return renderBySpec(cellSpec, rowIndex * 100 + colIndex, val, onUserInput);
     };
 
 
@@ -209,7 +220,7 @@ var TableField = React.createClass({displayName: "TableField",
     };
 
     var divId = 'div_' + this.props.id;
-    var classNames = mergeClassNames("form-group", this.props);
+    var classNames = mergeClassNames(null, this.props);
     var tableClassNames = getProp(this.props, 'tableClassName', '');
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
@@ -231,7 +242,7 @@ var DateField = React.createClass({displayName: "DateField",
         }
     },
   render: function() {
-    var classNames = mergeClassNames("form-group", this.props);
+    var classNames = mergeClassNames(null, this.props);
     var divId = "div_" + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
@@ -261,7 +272,7 @@ var SelectField = React.createClass({displayName: "SelectField",
             this.props.onUserInput(event.target.value);
     },
     render: function(){
-    var classNames = mergeClassNames("form-group", this.props);
+    var classNames = mergeClassNames(null, this.props);
     var divId = 'div_' + this.props.id;
       return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
@@ -311,7 +322,7 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
     },
   render: function() {
     var component = this;
-    var classNames = mergeClassNames("input-group", this.props);
+    var classNames = mergeClassNames(null, this.props);
     var divId = 'div_' + this.props.id;
     return (
       React.createElement("div", React.__spread({},  this.props, {id: divId, className: classNames}), 
@@ -360,7 +371,7 @@ var CheckboxesField = React.createClass({displayName: "CheckboxesField",
 
 
 
-function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
+function renderBySpec(itemSpec, childKey, dataValue, onUserInput, processDataUpdate)
 {
     var type = itemSpec.type;
     if (type == 'select') {
@@ -412,7 +423,8 @@ function renderBySpec(itemSpec, childKey, dataValue, onUserInput)
            itemSpec, 
             {key: childKey, 
             dataValue: dataValue, 
-            onUserInput: onUserInput
+            onUserInput: onUserInput, 
+            processDataUpdate: processDataUpdate
         })
         )
         );
@@ -470,14 +482,15 @@ var Form = React.createClass({displayName: "Form",
         return getProp(defaultVals, id, null);
     };
 
-    var updateData = function(data, updateSpec)
-    {
+    var defaultGetDeltaData = function(data, updateId, updateVal) {
+        var retval = {};
+        retval[updateId] = updateVal;
+        return retval;
     }
 
-    var processItem = function(updateVal, updateId) {
-        var deltaState = {};
-
-        deltaState[updateId] = updateVal;
+    var processDataUpdate = function(updateId, updateVal, getDeltaData) {
+        var currState = component.state;
+        var deltaState = getDeltaData(currState, updateId, updateVal);
         component.setState(deltaState);
 
         var url = getProp(component.props, 'url', null);
@@ -490,7 +503,8 @@ var Form = React.createClass({displayName: "Form",
                 console.log('param id:' + id + ', val:' + val);
                 userData[id] = val;
             }
-            userData[updateId] = updateVal;
+//
+//            userData[updateId] = updateVal;
 
             var userDataStr = JSON.stringify(userData);
 
@@ -528,18 +542,17 @@ var Form = React.createClass({displayName: "Form",
 
     var getHandleChangeFunc = function(id) {
         var f = function(val) {
-            return processItem(val, id);
+            return processDataUpdate(id, val, defaultGetDeltaData);
         };
         return f;
     };
-
   return (
     React.createElement("form", null, 
     this.props.spec.map(
         function(itemSpec, index, arr) {
             var onUserInput = getHandleChangeFunc(itemSpec.id);
             var dataValue = getFallbackVal(component.state, defaultVals, itemSpec.id)
-            return renderBySpec(itemSpec, index, dataValue, onUserInput);
+            return renderBySpec(itemSpec, index, dataValue, onUserInput, processDataUpdate);
         }
      )
     )
