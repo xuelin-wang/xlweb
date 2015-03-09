@@ -103,6 +103,7 @@ var InputField = React.createClass({
   render: function() {
     var classNames = mergeClassNames(null, this.props);
     var divId = 'div_' + this.props.id;
+    var inputStyle = getProp(this.props, 'inputStyle', {});
     return (
       <div {...this.props} id={divId} className={classNames}>
         { isNonempty(this.props,'label') ?
@@ -115,6 +116,7 @@ var InputField = React.createClass({
         <input
             type={this.props.type}
             className="form-control"
+            style={inputStyle}
             onChange={this.handleChange}
             value={this.props.dataValue} id={this.props.id} placeholder={this.props.placeHolder}
             >
@@ -135,7 +137,7 @@ var TableField = React.createClass({
         var header = getProp(props, 'header', ['']);
         var headerRowClassName = getProp(props, 'headerRowClassName', '');
         var headerColumnClassName = getProp(props, 'headerColumnClassName', '');
-        console.log("default header headerRowClassName: " + headerRowClassName + ",colClassName:" + headerColumnClassName + ",header:" + header.length);
+
         return (
           <tr key='0' className={headerRowClassName}>
               {header.map(

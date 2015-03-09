@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="react-datepicker/react-datepicker.css">
 
     <script src="jquery-2.1.3.min.js"></script>
+
     <script src="object.assign/browser.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="select2/js/select2.min.js"></script>
@@ -107,9 +108,13 @@ for (var rowIndex = 0; rowIndex < 10; rowIndex++) {
 var cellSpecsFunc = function(rowIndex, colIndex) {
     var id = 'param6_' + (rowIndex * 100 + colIndex);
     if (colIndex == 18 || colIndex == 17 && rowIndex % 2 == 0) {
+        var editCellStyle = {
+            width: 150
+        };
         return {
             id: id,
-            type: 'input'
+            type: 'input',
+            inputStyle: editCellStyle
         };
     }
     else
@@ -206,8 +211,8 @@ var spec=[
         label: 'Look, Ma, a table!',
         type: 'table',
         header: tableHeader,
-        className: 'table-border table-default',
-        columnClassName: 'text-align-center table-border table-default',
+        className: 'table-border table-default overflow-auto',
+        columnClassName: 'text-align-center',
         defaultValue: initialTableVals,
         cellSpecsFunc: cellSpecsFunc
     }
@@ -268,7 +273,6 @@ retvalSpec = [
 $( document ).ready(function() {
 
   $('select').select2();
-
 
   var retvalComponent = React.render(
     React.createElement(Form,
@@ -336,6 +340,9 @@ $( document ).ready(function() {
     ),
     document.getElementById("testFields")
   );
+
+
+/*  $("table").colResizable();*/
 
 });
 
