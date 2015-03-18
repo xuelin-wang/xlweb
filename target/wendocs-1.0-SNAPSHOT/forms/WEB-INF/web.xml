@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+<!DOCTYPE web-app PUBLIC
+ "-//Oracle Corporation//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd"
+        >
+ -->
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+
+    <servlet>
+        <servlet-name>invoke</servlet-name>
+        <servlet-class>xl.wendocs.InvokeServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>clojure</servlet-name>
+        <servlet-class>xl.wendocs.ClojureServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>updateList</servlet-name>
+        <servlet-class>xl.wendocs.UpdateListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>wendocs</servlet-name>
+        <servlet-class>xl.wendocs.WendocsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>invoke</servlet-name>
+        <url-pattern>/invoke</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>clojure</servlet-name>
+        <url-pattern>/clojure</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>updateList</servlet-name>
+        <url-pattern>/updateList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>wendocs</servlet-name>
+        <url-pattern>/wendocs</url-pattern>
+    </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/wendocs.iml" filepath="$PROJECT_DIR$/wendocs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xlweb.iml" filepath="$PROJECT_DIR$/xlweb.iml" />
     </modules>
   </component>
 </project>
