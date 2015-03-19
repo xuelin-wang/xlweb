@@ -131,20 +131,36 @@ var InputField = React.createClass({
 });
 
 var TableField = React.createClass({
+
+  getInitialState: function() {
+    return {activeHeaderIndex: -1};
+  },
+
   render: function() {
+    var component = this;
 
     var defaultTableHeaderRowRenderer = function(props) {
         var header = getProp(props, 'header', ['']);
         var headerRowClassName = getProp(props, 'headerRowClassName', '');
         var headerColumnClassName = getProp(props, 'headerColumnClassName', '');
+        var onMouseOver = function(index) {
+            component.setState({activeHeaderIndex: index});
+        };
+        var onMouseOut = function(index) {
+            component.setState({activeHeaderIndex: -1});
+        };
 
         return (
           <tr key='0' className={headerRowClassName}>
               {header.map(
                   function(col, index, cols) {
+        var spanClassNames = component.state.activeHeaderIndex == index ? 'display-inline' : 'display-none';
+        var leftSpanClassNames = 'float-left ' + spanClassNames;
+        var rightSpanClassNames = 'float-right ' + spanClassNames;
+
                   return (
-                  <td key={index} className={headerColumnClassName}>
-                  {col}
+                  <td key={index} onMouseOver={onMouseOver.bind(this, index)} onMouseOut={onMouseOut.bind(this, index)} className={headerColumnClassName}>
+                  <span className={leftSpanClassNames}>{'\u25c0'}</span><span className='display-inline'>{col}</span><span className={rightSpanClassNames}>{'\u25b2 \u25bc \u25b6'}</span>
                   </td>
                   );
                   }
@@ -194,7 +210,6 @@ var TableField = React.createClass({
 
     var renderValue = dataValue.slice(0);//clone, may be expensive for large array!!
     renderValue.splice(0, 0, header);
-    var component = this;
 
     var dataRowRenderer = function(row, rowIndex, rows, props)
     {
